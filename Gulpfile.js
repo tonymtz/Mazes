@@ -6,6 +6,8 @@ var
   stylus = require('gulp-stylus'),
   uglify = require('gulp-uglify'),
   livereload = require('gulp-livereload'),
+  jshint = require('gulp-jshint'),
+  stylish = require('jshint-stylish'),
   spawn = require('child_process').spawn,
   node,
 
@@ -15,7 +17,7 @@ var
     views: './app/views/**/*.jade',
     styles: './app/styles/*.styl',
     assets: './app/assets/*.png', // png only, fck jpg!!
-    server: './server/*.js' // png only, fck jpg!!
+    server: './server/*.js'
   };
 
 // Gulp's "internal" tasks definition
@@ -25,8 +27,7 @@ gulp.task('jade', function() {
     pretty: true,
     basedir:'./app/views'
   }))
-  .pipe(gulp.dest('./build'))
-  .pipe(livereload());
+  .pipe(gulp.dest('./build'));
 });
 
 gulp.task('compress', function() {
@@ -38,15 +39,19 @@ gulp.task('compress', function() {
 gulp.task('scripts', function() {
   gulp.src('./app/js/*.js')
     .pipe(uglify({outSourceMap: true}))
-    .pipe(gulp.dest('./build/js'))
-    .pipe(livereload());
+    .pipe(gulp.dest('./build/js'));
+});
+
+gulp.task('lint', function() {
+  gulp.src('./app/js/*.js')
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish));
 });
 
 gulp.task('stylus', function () {
   gulp.src('./app/styles/style.styl')
     .pipe(stylus())
-    .pipe(gulp.dest('./build/css'))
-    .pipe(livereload());
+    .pipe(gulp.dest('./build/css'));
 });
 
 gulp.task('copy-assets', function() {
@@ -62,7 +67,7 @@ gulp.task('server', function() {
       console.log('Error detected, waiting for changes...');
     }
   });
-})
+});
 
 gulp.task('clean', function() {
   gulp.src('app/tmp', {read: false})
@@ -70,23 +75,20 @@ gulp.task('clean', function() {
 });
 
 // Here goes our important tasks... our "macros"
-gulp.task('build', ['stylus', 'jade', 'scripts', 'copy-assets']);
+gulp.task('build', ['stylus', 'jade', 'lint', 'scripts', 'copy-assets']);
 gulp.task('default', ['server', 'build', 'watch']);
-gulp.task('reload', function(){
-  connect.reload()
-})
 
 // Watcher
 gulp.task('watch', function() {
   livereload.listen();
-  gulp.watch(paths.styles, ['stylus']);
-  gulp.watch(paths.views, ['jade']);
-  gulp.watch(paths.scripts, ['scripts']);
-  gulp.watch(paths.assets, ['copy-assets']);
+  gulp.watch(paths.styles, ['stylus']).on('change', livereload.changed);
+  gulp.watch(paths.views, ['jade']).on('change', livereload.changed);
+  gulp.watch(paths.scripts, ['scripts']).on('change', livereload.changed);
+  gulp.watch(paths.assets, ['copy-assets']).on('change', livereload.changed);
   gulp.watch(paths.server, ['server']);
 });
 
 // Clean up if an error goes unhandled.
 process.on('exit', function() {
     if (node) node.kill()
-})
+});
