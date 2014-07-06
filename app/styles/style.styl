@@ -1,18 +1,59 @@
 @import _color
 @import _mixins
+@import _functions
+@import 'themes/default.styl'
+
+*
+  clear both
+  box-sizing border-box
+  margin 0
+  outline none
+  padding 0
+
+html, body
+  wide()
 
 body
-  background-color clouds
-  font-family 'Ubuntu', sans-serif
+  font-family $defaultFont
+  font-size $fontSizeMD
+  overflow hidden
 
-#screen
-  box-shadow(2px 2px 10px maethyst)
-  width 500px
-  height 300px
+header
+  wideTopBar()
+  background $headerBackground
+  color $headerColor
+  height $headerHeight
+  padding 0 $paddingBase
 
-h1
-  text-transform uppercase
-  font-size 1.2em
-  span
-    font-size 1.5em
-    color wisteria
+  h1
+    font-size $fontSizeLG
+    font-weight normal
+    line-height $headerHeight
+    margin 0
+    padding 0
+    text-transform uppercase
+
+    span
+      color $headerHighlightColor
+      font-family $emphasizeFont
+      font-size $fontSizeXL
+      font-style italic
+      font-weight bold
+
+footer
+  wideBottomBar()
+  background $footerBackground
+  color $footerColor
+  height $footerHeight
+  line-height $footerHeight
+  padding 0 $paddingBase
+
+  h5
+    font-size $fontSizeSM
+    font-weight normal
+    height $footerHeight
+    margin 0
+    padding 0
+
+.fullScreen
+  wide()
