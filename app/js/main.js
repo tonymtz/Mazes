@@ -1,4 +1,4 @@
-;(function(Phaser, $) {
+;(function(Phaser, $, window) {
   'use strict';
 
   var maze,
@@ -8,6 +8,10 @@
     cursors,
     playerData = {
       vel: 80
+    },
+    bounds = {
+      height: $(window).height(),
+      width: $(window).width()
     };
 
   $.getJSON('/maze', function(data){
@@ -105,6 +109,6 @@
     // game.debug.bodyInfo(player, 16, 24);
   }
 
-  game = new Phaser.Game(500, 300, Phaser.AUTO, 'screen', { preload: preload, create: create, update: update, render: render });
+  game = new Phaser.Game(bounds.width, bounds.height, Phaser.AUTO, 'screen', { preload: preload, create: create, update: update, render: render });
 
-})(Phaser, $);
+})(Phaser, $, window);
