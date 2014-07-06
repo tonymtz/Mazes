@@ -12,3 +12,22 @@ Some of the future features:
 - Fun
 
 This project is in development, thanks!
+
+
+### How to run locally? ###
+
+* Install [NodeJS](http://nodejs.org/download/)
+* Install Node dependencies
+```bash
+$ npm install
+```
+* Install Bower resources
+```bash
+$ bower install
+```
+
+### Rules to add code
+
+* Fork this project
+* Make your changes
+* Pull Fork request
