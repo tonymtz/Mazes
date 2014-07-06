@@ -1,0 +1,33 @@
+# General Gameplay
+
+- Add mouse support
+- Add touchscreen support with virtual buttons (see sample:
+- Switch to Fullscreen toggle
+-
+
+
+# Configurations
+
+- config/db -
+- config/world - world bounds or sizes
+
+
+# Data
+
+- tileset: {name, fileName, tiles:{_id, offsetX, offsetY, with, height}}
+- maps: {name, width, height, tileset}
+- mobs: {name, hp, items, fileName}
+- items: {name, price, skills, fileName}
+- players: {name, hp, maxhp, sp, maxsp, skills:{name, level}, exp, maxexp, level}
+
+
+# DevOPS
+
+- Generate a build script for Node first-timers, should download and install node, npm, and start the build process
+
+
+# Development
+
+- Random exit
+- Random items
+- MongoDB support for mazes and sessions
