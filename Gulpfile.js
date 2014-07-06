@@ -13,11 +13,11 @@ var
 
 // Our paths, to make easier getting with our files
   paths = {
-    scripts: './app/js/*.js',
+    scripts: './app/js/**/*.js',
     views: './app/views/**/*.jade',
-    styles: './app/styles/*.styl',
-    assets: './app/assets/*.png', // png only, fck jpg!!
-    server: './server/*.js'
+    styles: './app/styles/**/*.styl',
+    assets: './app/assets/**/*.png', // png only, fck jpg!!
+    server: './server/**/*.js'
   };
 
 // Gulp's "internal" tasks definition
