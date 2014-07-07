@@ -21,8 +21,7 @@ wideTopBar()
 
 // UI-related stuff
 toolbar()
-  display inline-block
-  float right
+  font-size $fontSizeMD
 
 button()
   border-radius(5px)
@@ -32,4 +31,11 @@ button()
   color $defaultButtonColor
   cursor pointer
   display inline-block
-  padding $paddingMinimal $paddingBase * 5
+  height $defaultButtonHeight
+  line-height $defaultButtonHeight
+  margin 0 $paddingMinimal
+  padding 0 $paddingBase * 5
+
+  &:hover
+    background $defaultButtonBackground + $defaultIncrement
+    color $defaultButtonColor + $defaultIncrement

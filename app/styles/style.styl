@@ -4,8 +4,8 @@
 @import 'themes/default.styl'
 
 *
+  vendor("box-sizing", border-box)
   clear both
-  box-sizing border-box
   margin 0
   outline none
   padding 0
@@ -14,23 +14,25 @@ html, body
   wide()
 
 body
+  background $defaultBackground
+  color $defaultColor
   font-family $defaultFont
   font-size $fontSizeMD
   overflow hidden
+
+h1, h2, h3, h4, h5
+  padding 0 $paddingBase
 
 header
   wideTopBar()
   background $headerBackground
   color $headerColor
   height $headerHeight
-  padding 0 $paddingBase
 
   h1
     font-size $fontSizeLG
     font-weight normal
     line-height $headerHeight
-    margin 0
-    padding 0
     text-transform uppercase
 
     span
@@ -48,12 +50,19 @@ footer
   line-height $footerHeight
   padding 0 $paddingBase
 
-  h5
-    font-size $fontSizeSM
-    font-weight normal
-    height $footerHeight
-    margin 0
-    padding 0
-
 .fullScreen
   wide()
+
+.button
+  button()
+
+.toolButtons
+  toolbar()
+  height $footerHeight
+  line-height $footerHeight
+
+  .button
+    float right
+
+    #goFullScreen
+      opacity 0.5
