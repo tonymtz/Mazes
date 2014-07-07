@@ -17,6 +17,7 @@
     "smarttabs": true,
     "white": true,
     "globals": {
+        "console": false,
         "window": false,
         "Phaser": false,
         "$": false
