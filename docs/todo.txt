@@ -1,9 +1,8 @@
 # General Gameplay
 
 - Add mouse support
-- Add touchscreen support with virtual buttons (see sample:
-- Switch to Fullscreen toggle
--
+- Add touchscreen support with virtual buttons
+✓ Switch to Fullscreen toggle [adykto]
 
 
 # Configurations

@@ -1,6 +1,22 @@
 // Global vars, please, Keep it simple!
+$borderIncrement = #333
 $foregroundIncrement = #999
+$paddingMinimal = 0.1rem
 $paddingBase = 0.25rem
+$paddingBorderOffset = $paddingBase * 2
+
+// Body
+$defaultBackground = #000
+$defaultColor = #666
+$defaultIncrement = #111
+$defaultHightlight = #666
+$defaultHeight = 1em
+
+// Buttons
+$defaultButtonBackground = #892
+$defaultButtonColor = $defaultButtonBackground + $foregroundIncrement
+$defaultBorderColor = $defaultButtonBackground + $borderIncrement
+$defaultButtonHeight = $defaultHeight * 2
 
 // Fonts
 $defaultFont = 'Ubuntu', Helvetica, Arial, sans-serif
@@ -15,9 +31,9 @@ $fontSizeXL = 1.5rem
 $headerBackground = rgba(0,0,0,0.5)
 $headerColor = $headerBackground + $foregroundIncrement
 $headerHighlightColor = $headerColor + $foregroundIncrement
-$headerHeight = 3rem
+$headerHeight = $defaultHeight * 3
 
 // Footer properties
 $footerBackground = rgba(0,0,0,0.7)
 $footerColor = $footerBackground + $foregroundIncrement
-$footerHeight = 2rem
+$footerHeight = $defaultHeight * 2

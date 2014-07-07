@@ -41,6 +41,7 @@
     game.physics.startSystem(Phaser.Physics.ARCADE);
     game.world.setBounds(0, 0, 1984, 1984);
     game.stage.backgroundColor = '#424242';
+    game.scale.fullScreenScaleMode = Phaser.ScaleManager.NO_SCALE;
 
     game.add.tileSprite(0, 0, 1984, 1984, 'grass');
 
@@ -66,6 +67,10 @@
 
     //  And some controls to play the game with
     cursors = game.input.keyboard.createCursorKeys();
+
+    $('#goFullScreen').on('click', goFullScreen);
+
+    $(window).on('resize', resizeGame);
   }
 
   function update() {
@@ -107,6 +112,20 @@
   function render () {
     // game.debug.body(player);
     // game.debug.bodyInfo(player, 16, 24);
+
+    if (game.scale.isFullScreen) {
+      game.debug.text('Press ESC to exit fullscreen', 15, 15);
+    }
+  }
+
+  function goFullScreen() {
+    game.scale.startFullScreen();
+    resizeGame();
+  }
+
+  function resizeGame(){
+    game.renderer.resize(window.innerWidth, window.innerHeight);
+    $('#screen').find('canvas').width(window.innerWidth).height(window.innerHeight);
   }
 
   game = new Phaser.Game(bounds.width, bounds.height, Phaser.AUTO, 'screen', { preload: preload, create: create, update: update, render: render });

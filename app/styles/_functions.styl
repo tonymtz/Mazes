@@ -1,3 +1,4 @@
+// Size-related mixins
 wide()
   height 100%
   margin 0
@@ -16,3 +17,25 @@ wideBottomBar()
 wideTopBar()
   wideBar()
   top 0
+
+
+// UI-related stuff
+toolbar()
+  font-size $fontSizeMD
+
+button()
+  border-radius(5px)
+  background $defaultButtonBackground
+  border $paddingMinimal solid $defaultBorderColor
+  clear none
+  color $defaultButtonColor
+  cursor pointer
+  display inline-block
+  height $defaultButtonHeight
+  line-height $defaultButtonHeight
+  margin 0 $paddingMinimal
+  padding 0 $paddingBase * 5
+
+  &:hover
+    background $defaultButtonBackground + $defaultIncrement
+    color $defaultButtonColor + $defaultIncrement
