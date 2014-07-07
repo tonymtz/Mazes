@@ -1,114 +1,117 @@
-;(function(Phaser, $, window) {
+/* globals requestAnimFrame */
+;(function(PIXI, KeyboardJS, $, io, window) {
   'use strict';
 
-  var maze,
-    game,
-    blocks,
-    player,
-    cursors,
-    playerData = {
-      vel: 80
-    },
+  var
     bounds = {
       height: $(window).height(),
       width: $(window).width()
-    };
+    },
+    maze,
+    player = {
+      location: {
+        x: 1,
+        y: 1
+      }
+    },
+    other = {
+      data: [],
+      render: {}
+    },
+    socket = io();
 
-  $.getJSON('/maze', function(data){
-    maze = data;
+  socket.on('map_rerender', function(map) {
+    maze = map;
+    drawMap();
   });
 
+  socket.on('player_update', function(data) {
+    player = data;
+  });
+
+  socket.on('other_update', function(data) {
+    other.data = data;
+    drawOther();
+  });
+
+  // Controls, powered by KeyboardJS
+  KeyboardJS.on('up', function() {
+    socket.emit('player_move', 'up');
+  });
+
+  KeyboardJS.on('right', function() {
+    socket.emit('player_move', 'right');
+  });
+
+  KeyboardJS.on('down', function() {
+    socket.emit('player_move', 'down');
+  });
+
+  KeyboardJS.on('left', function() {
+    socket.emit('player_move', 'left');
+  });
+
+  var blockTexture = PIXI.Texture.fromImage('assets/block2.png'),
+    otherTexture = PIXI.Texture.fromImage('assets/grass.jpg'),
+    heroTexture = PIXI.Texture.fromImage('assets/block.png');
+
   function drawMap() {
-    for (var i = 0; i < 31; i += 1) {
-      for (var j = 0; j < 31; j += 1) {
+    for (var i = 0; i < 15; i += 1) {
+      for (var j = 0; j < 15; j += 1) {
         if (maze[i][j] === 1) {
-          // game.add.sprite(i * 32, j * 32, 'block');
-          var c = blocks.create(i * 64, j * 64, 'block');
-          c.name = 'block' + i + j;
-          c.body.immovable = true;
+          var newBlock = new PIXI.Sprite(blockTexture);
+          newBlock.height = 32;
+          newBlock.width = 32;
+          newBlock.position.x = i * 32;
+          newBlock.position.y = j * 32;
+          stage.addChild(newBlock);
+          renderer.render(stage);
         }
       }
     }
   }
 
-  function preload() {
-    game.load.spritesheet('block', 'assets/block2.png', 64, 64);
-    game.load.spritesheet('dude', 'assets/dude.png', 16, 16, 60);
-    game.load.spritesheet('grass', 'assets/grass2.jpg', 64, 64);
+  function drawOther() {
+    other.data.forEach(function(obj) {
+      var render;
+      if (other.render[obj.id]) {
+        render = other.render[obj.id];
+      } else {
+        render = other.render[obj.id] = new PIXI.Sprite(otherTexture);
+        render.height = 32;
+        render.width = 32;
+        stage.addChild(render);
+      }
+      render.position.x = obj.x * 32;
+      render.position.y = obj.y * 32;
+    });
   }
 
-  function create() {
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-    game.world.setBounds(0, 0, 1984, 1984);
-    game.stage.backgroundColor = '#424242';
+  var stage = new PIXI.Stage(0x66FF99);
+  // create a renderer instance.
+  var renderer = PIXI.autoDetectRenderer(bounds.width, bounds.height);
 
-    game.add.tileSprite(0, 0, 1984, 1984, 'grass');
+  var hero = new PIXI.Sprite(heroTexture);
+  hero.height = 32;
+  hero.width = 32;
+  hero.position.x = player.location.x;
+  hero.position.y = player.location.y;
+  stage.addChild(hero);
 
-    blocks = game.add.group();
-    blocks.enableBody = true;
-    blocks.physicsBodyType = Phaser.Physics.ARCADE;
-    drawMap();
-
-    //  The hero!
-    player = game.add.sprite(64, 64, 'dude');   //this adds our player to the scene  (xposition, yposition, cachekey)
-    game.physics.enable(player); // enable physics for the player (arcade)
-    // player.anchor.setTo(0.5,0.5); // set the anchor to the exact middle of the player (good for flipping the image on the same place)
-    game.camera.follow(player);   // camera allways center the player
-    // player.body.width=16;  // my player image is smaller than the sprite frame size so this is a simple correction of the physicsbody so it does not look weird
-    player.body.setSize(12, 16, 2, 0);
-
-    // this adds an animation for later use (custom cachekey, frames used for the animation, frames played per second, loop )
-    player.animations.add('stand', [13], 1, false);
-    player.animations.add('walk_left', [48,49,48,50], 10, true);
-    player.animations.add('walk_right', [36,37,36,38], 10, true);
-    player.animations.add('walk_up', [24,25,24,26], 10, true);
-    player.animations.add('walk_down', [13,14,13,15], 10, true);
-
-    //  And some controls to play the game with
-    cursors = game.input.keyboard.createCursorKeys();
-  }
+  renderer.render(stage);
 
   function update() {
-    game.physics.arcade.collide(player, blocks);
-    //  Reset the player, then check for movement keys
-    player.body.velocity.setTo(0, 0);
+    hero.position.x = player.location.x * 32;
+    hero.position.y = player.location.y * 32;
+    renderer.render(stage);
 
-    if (cursors.left.isDown)
-    {
-      player.body.velocity.x = -playerData.vel;
-      player.animations.play('walk_left');
-    }
-    else if (cursors.right.isDown)
-    {
-      player.body.velocity.x = playerData.vel;
-      player.animations.play('walk_right');
-    }
-    else if (cursors.up.isDown)
-    {
-      player.body.velocity.y = -playerData.vel;
-      player.animations.play('walk_up');
-    }
-    else if (cursors.down.isDown)
-    {
-      player.body.velocity.y = playerData.vel;
-      player.animations.play('walk_down');
-    }
-    else {
-      player.animations.play('stand');
-    }
-
-    // var collisionHandler = function() {
-    //   console.log('asdsd');
-    //   player.body.velocity.setTo(0, 0);
-    // };
-    // game.physics.arcade.overlap(player, blocks, collisionHandler, null, this);
+    requestAnimFrame(update);
   }
 
-  function render () {
-    // game.debug.body(player);
-    // game.debug.bodyInfo(player, 16, 24);
-  }
+  requestAnimFrame(update);
 
-  game = new Phaser.Game(bounds.width, bounds.height, Phaser.AUTO, 'screen', { preload: preload, create: create, update: update, render: render });
+  // add the renderer view element to the DOM
+  $('#screen').append(renderer.view);
 
-})(Phaser, $, window);
+  socket.emit('connection');
+})(PIXI, KeyboardJS, $, io, window);
