@@ -1,2 +1,1 @@
-cd amazeing
-node server.js
+forever stop amazeing/server.js
