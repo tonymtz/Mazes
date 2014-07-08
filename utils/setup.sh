@@ -1,1 +1,2 @@
-forever stop amazeing/server.js
+killall node
+node server.js &
