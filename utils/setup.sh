@@ -1,4 +1,1 @@
-npm install
-npm install bower
-bower install
-gulp build
+node server.js
