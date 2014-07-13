@@ -1,3 +1,4 @@
+#!/bin/env node
 (function(module) {
   'use strict';
 
@@ -25,7 +26,8 @@
     }
     maze[row][column] = 0;
     generateWorld(row, column, maze, height, width, 2);
-    maze = growIt(maze, 3);
+    // addExit(maze, width, height, 2);
+    maze = growIt(maze, multiplicator);
     replaceForObjects(maze);
     return maze;
   }
@@ -50,7 +52,7 @@
    * @width - maze width
    * @exits - number of exits [1-4]
    */
-  function generateWorld(row, col, maze, height, width, exits) {
+  function generateWorld(row, col, maze, height, width) {
     var randDirs = randomDirections();
     for (var i = 0; i < randDirs.length; i += 1) {
       switch (randDirs[i]) {
@@ -93,26 +95,6 @@
             maze[row][col - 1] = 0;
             generateWorld(row, col - 2, maze, height, width);
           }
-          break;
-      }
-    }
-
-    if (typeof exits !== 'number' || exits > 4) return;
-    for (var i = 0; i < exits; i += 1) {
-      var xHalf = Math.floor(width / 2);
-      var yHalf = Math.floor(height / 2);
-      switch (randDirs.pop()) {
-        case 1:
-          maze[xHalf][0] = 0;
-          break;
-        case 2:
-          maze[xHalf][height - 1] = 0;
-          break;
-        case 3:
-          maze[0][yHalf] = 0;
-          break;
-        case 4:
-          maze[width - 1][yHalf] = 0;
           break;
       }
     }
@@ -164,7 +146,32 @@
     return buffer;
   }
 
-  module.exports = function(height, width) {
-    return new MazeGenerator(height, width);
+  /*
+   * @exits - number of exits [1-4]
+   */
+  function addExit(maze, width, height, exits) {
+    if (typeof exits !== 'number' || exits > 4) return;
+    for (var i = 0; i < exits; i += 1) {
+      var xHalf = Math.floor(width / 2);
+      var yHalf = Math.floor(height / 2);
+      switch (randDirs.pop()) {
+        case 1:
+          maze[xHalf][0] = 0;
+          break;
+        case 2:
+          maze[xHalf][height - 1] = 0;
+          break;
+        case 3:
+          maze[0][yHalf] = 0;
+          break;
+        case 4:
+          maze[width - 1][yHalf] = 0;
+          break;
+      }
+    }
+  }
+
+  module.exports = function(height, width, multiplicator) {
+    return new MazeGenerator(height, width, multiplicator);
   };
 })(module || this);

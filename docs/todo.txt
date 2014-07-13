@@ -29,6 +29,19 @@
 
 # Development
 
-- Random exit
-- Random items
+  Mazes:
+  ✓ Random maze generation [TonyMtz]
+  ✓ Random exit [TonyMtz]
+  - Player moves through rooms
+  - Blocks hierarchy and update collisions
+  - Random items
+
+  Players:
+  ✓ Player movement
+  - Player collisions
+    ✓ vs Wall
+    - vs Player
+  - Player stats
+  - Player attacking
+
 - MongoDB support for mazes and sessions

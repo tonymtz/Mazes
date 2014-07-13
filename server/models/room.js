@@ -1,22 +1,17 @@
+#!/bin/env node
 (function(module) {
   'use strict';
 
   var Maze = require('./maze'),
-    Room = function(height, width, multiplicator) {
+    Room = function(id) {
+      this.id = id;
+      this.maze = new Maze(15, 15, 3);
       this.players = [];
-      this.map = new Maze(height, width, multiplicator);
-      this.multiplicator = multiplicator;
     };
 
   Room.prototype.print = function() {
-    var map = this.map.slice(0),
-      player;
-    // for (var i = 0; i < this.players.length; i += 1) {
-    //   player = this.players[i];
-    //   map[player.location.x][player.location.y] = 9;
-    // }
-    return map;
+    return this.maze;
   }
 
-  module.exports = Room;
+  module.exports = Room
 })(module || this);

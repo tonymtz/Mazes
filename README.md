@@ -14,6 +14,7 @@ Some of the future features:
 This project is in development, thanks!
 
 ### Instalation ###
+* Clone repo
 * Install [NodeJS](http://nodejs.org/download/)
 * Install Node dependencies
 ```bash

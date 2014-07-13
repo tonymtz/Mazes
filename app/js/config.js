@@ -31,6 +31,7 @@
     },
     events: {
       onMapRender: 'map_rerender',
+      onPlayerDrop: 'player_drop',
       onPlayerMove: 'player_move',
       onPlayerUpdate: 'player_update',
       onOtherUpdate: 'other_update'

@@ -1,3 +1,4 @@
+#!/bin/env node
 (function(module) {
   'use strict';
 

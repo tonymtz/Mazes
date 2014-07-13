@@ -1,2 +1,2 @@
-// Only for openshift
+#!/bin/env node
 require('./server/index');
