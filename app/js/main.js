@@ -56,14 +56,14 @@
     heroTexture = PIXI.Texture.fromImage('assets/block.png');
 
   function drawMap() {
-    for (var i = 0; i < 15; i += 1) {
-      for (var j = 0; j < 15; j += 1) {
-        if (maze[i][j] === 1) {
+    for (var i = 0; i < maze.length; i += 1) {
+      for (var j = 0; j < maze[i].length; j += 1) {
+        if (maze[i][j].sprite === 'wall_01') {
           var newBlock = new PIXI.Sprite(blockTexture);
-          newBlock.height = 32;
-          newBlock.width = 32;
-          newBlock.position.x = i * 32;
-          newBlock.position.y = j * 32;
+          newBlock.height = 16;
+          newBlock.width = 16;
+          newBlock.position.x = i * 16;
+          newBlock.position.y = j * 16;
           stage.addChild(newBlock);
           renderer.render(stage);
         }
@@ -78,12 +78,12 @@
         render = other.render[obj.id];
       } else {
         render = other.render[obj.id] = new PIXI.Sprite(otherTexture);
-        render.height = 32;
-        render.width = 32;
+        render.height = 16;
+        render.width = 16;
         stage.addChild(render);
       }
-      render.position.x = obj.x * 32;
-      render.position.y = obj.y * 32;
+      render.position.x = obj.x * 16;
+      render.position.y = obj.y * 16;
     });
   }
 
@@ -92,8 +92,8 @@
   var renderer = PIXI.autoDetectRenderer(bounds.width, bounds.height);
 
   var hero = new PIXI.Sprite(heroTexture);
-  hero.height = 32;
-  hero.width = 32;
+  hero.height = 16;
+  hero.width = 16;
   hero.position.x = player.location.x;
   hero.position.y = player.location.y;
   stage.addChild(hero);
@@ -101,8 +101,9 @@
   renderer.render(stage);
 
   function update() {
-    hero.position.x = player.location.x * 32;
-    hero.position.y = player.location.y * 32;
+    hero.position.x = player.location.x * 16;
+    hero.position.y = player.location.y * 16;
+
     renderer.render(stage);
 
     requestAnimFrame(update);
@@ -113,5 +114,6 @@
   // add the renderer view element to the DOM
   $('#screen').append(renderer.view);
 
-  socket.emit('connection');
+  // var name = prompt('What is your name?');
+  socket.emit('connection', 'TonyMtz');
 })(PIXI, KeyboardJS, $, io, window);
