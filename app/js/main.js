@@ -87,8 +87,7 @@
     });
   }
 
-  var stage = new PIXI.Stage(0x66FF99);
-  // create a renderer instance.
+  var stage = new PIXI.Stage(0);
   var renderer = PIXI.autoDetectRenderer(bounds.width, bounds.height);
 
   var hero = new PIXI.Sprite(heroTexture);
@@ -111,9 +110,7 @@
 
   requestAnimFrame(update);
 
-  // add the renderer view element to the DOM
   $('#screen').append(renderer.view);
 
-  // var name = prompt('What is your name?');
   socket.emit('connection', 'TonyMtz');
 })(PIXI, KeyboardJS, $, io, window);
