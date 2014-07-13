@@ -2,9 +2,10 @@
   'use strict';
 
   var Maze = require('./maze'),
-    Room = function(height, width) {
+    Room = function(height, width, multiplicator) {
       this.players = [];
-      this.map = new Maze(height, width);
+      this.map = new Maze(height, width, multiplicator);
+      this.multiplicator = multiplicator;
     };
 
   Room.prototype.print = function() {

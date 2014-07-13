@@ -7,11 +7,15 @@
       this.id = id;
       this.name = name;
       this.location = {
-        x: 1,
-        y: 1,
+        x: 3,
+        y: 3,
         room: 0
       };
     };
+
+  function checkCollision(other) {
+    return other.type === 'wall';
+  }
 
   Player.prototype.enterRoom = function(room) {
     var self = this,
@@ -27,32 +31,34 @@
 
     this.location.room = room;
     room.players.push(this);
-    room.map[this.location.x][this.location.y] = 9;
+    this.location.x = room.multiplicator;
+    this.location.y = room.multiplicator;
+    room.map[room.multiplicator][room.multiplicator] = 9;
   };
 
   Player.prototype.move = function(dir) {
     var map = this.location.room.map;
     switch(dir) {
       case 'left':
-        if (map[this.location.x - 1][this.location.y] === 1) break;
+        if (checkCollision(map[this.location.x - 1][this.location.y])) break;
         map[this.location.x][this.location.y] = 0;
         this.location.x -= 1;
         map[this.location.x][this.location.y] = 9;
         break;
       case 'right':
-        if (map[this.location.x + 1][this.location.y] === 1) break;
+        if (checkCollision(map[this.location.x + 1][this.location.y])) break;
         map[this.location.x][this.location.y] = 0;
         this.location.x += 1;
         map[this.location.x][this.location.y] = 9;
         break;
       case 'down':
-        if (map[this.location.x][this.location.y + 1] === 1) break;
+        if (checkCollision(map[this.location.x][this.location.y + 1])) break;
         map[this.location.x][this.location.y] = 0;
         this.location.y += 1;
         map[this.location.x][this.location.y] = 9;
         break;
       case 'up':
-        if (map[this.location.x][this.location.y - 1] === 1) break;
+        if (checkCollision(map[this.location.x][this.location.y - 1])) break;
         map[this.location.x][this.location.y] = 0;
         this.location.y -= 1;
         map[this.location.x][this.location.y] = 9;

@@ -1,11 +1,13 @@
 (function(module) {
   'use strict';
 
+  var Block = require('./block');
+
   function nextInt(max) {
     return Math.floor(Math.random() * max);
   }
 
-  function MazeGenerator(height, width) {
+  function MazeGenerator(height, width, multiplicator) {
     var maze = [];
     for (var i = 0; i < height; i += 1) {
       maze[i] = [];
@@ -22,7 +24,9 @@
       column = nextInt(width);
     }
     maze[row][column] = 0;
-    recursion(row, column, maze, height, width);
+    generateWorld(row, column, maze, height, width, 2);
+    maze = growIt(maze, 3);
+    replaceForObjects(maze);
     return maze;
   }
 
@@ -38,10 +42,17 @@
     return shuffle(randoms);
   }
 
-  function recursion(row, col, maze, height, width) {
+  /*
+   * @row - number of initial row for generator
+   * @row - number of initial col for generator
+   * @maze - maze array[[]]
+   * @height - maze height
+   * @width - maze width
+   * @exits - number of exits [1-4]
+   */
+  function generateWorld(row, col, maze, height, width, exits) {
     var randDirs = randomDirections();
-    // var randDirs = [1,2,3,4];
-    for (var i = 0; i < randDirs.length; i++) {
+    for (var i = 0; i < randDirs.length; i += 1) {
       switch (randDirs[i]) {
         case 1: // up
           if (row - 2 < 0) {
@@ -50,7 +61,7 @@
           if (maze[row - 2][col] !== 0) {
             maze[row - 2][col] = 0;
             maze[row - 1][col] = 0;
-            recursion(row - 2, col, maze, height, width);
+            generateWorld(row - 2, col, maze, height, width);
           }
           break;
         case 2: // right
@@ -60,7 +71,7 @@
           if (maze[row][col + 2] !== 0) {
             maze[row][col + 2] = 0;
             maze[row][col + 1] = 0;
-            recursion(row, col + 2, maze, height, width);
+            generateWorld(row, col + 2, maze, height, width);
           }
           break;
         case 3: // down
@@ -70,7 +81,7 @@
           if (maze[row + 2][col] !== 0) {
             maze[row + 2][col] = 0;
             maze[row + 1][col] = 0;
-            recursion(row + 2, col, maze, height, width);
+            generateWorld(row + 2, col, maze, height, width);
           }
           break;
         case 4: // left
@@ -80,11 +91,77 @@
           if (maze[row][col - 2] !== 0) {
             maze[row][col - 2] = 0;
             maze[row][col - 1] = 0;
-            recursion(row, col - 2, maze, height, width);
+            generateWorld(row, col - 2, maze, height, width);
           }
           break;
       }
     }
+
+    if (typeof exits !== 'number' || exits > 4) return;
+    for (var i = 0; i < exits; i += 1) {
+      var xHalf = Math.floor(width / 2);
+      var yHalf = Math.floor(height / 2);
+      switch (randDirs.pop()) {
+        case 1:
+          maze[xHalf][0] = 0;
+          break;
+        case 2:
+          maze[xHalf][height - 1] = 0;
+          break;
+        case 3:
+          maze[0][yHalf] = 0;
+          break;
+        case 4:
+          maze[width - 1][yHalf] = 0;
+          break;
+      }
+    }
+  }
+
+  /*
+   * @maze - maze array[[]]
+   */
+  function replaceForObjects(maze) {
+    for (var i = 0; i < maze.length; i += 1) {
+      for (var j = 0; j < maze.length; j += 1) {
+        if (maze[i][j] === 1) {
+          maze[i][j] = new Block();
+        }
+      }
+    }
+  }
+
+  /*
+   * @maze - maze array[[]]
+   * @times - how many times the maze will increase
+   */
+  function growIt(maze, times) {
+    var buffer = [],
+      parsedTimes = parseInt(times, 10),
+      counter,
+      counter2;
+
+    times = isNaN(parsedTimes) ? 1 : parsedTimes;
+
+    for (var i = 0; i < maze.length; i += 1) {
+      counter = times;
+      while (counter) {
+        buffer[i * times + counter - 1] = [];
+        counter -= 1;
+      }
+      for (var j = 0; j < maze[0].length; j += 1) {
+        counter = times;
+        while (counter) {
+          counter2 = times;
+          while (counter2) {
+            buffer[i * times + counter2 - 1][j * times  + counter - 1] = maze[i][j];
+            counter2 -= 1;
+          }
+          counter -= 1;
+        }
+      }
+    }
+    return buffer;
   }
 
   module.exports = function(height, width) {
