@@ -1,116 +1,125 @@
 /* globals requestAnimFrame */
-;(function(PIXI, KeyboardJS, $, io, window) {
+;(function(PIXI, CONFIG, Sockets, Controls, $, io, window) {
   'use strict';
 
-  var
-    bounds = {
-      height: $(window).height(),
-      width: $(window).width()
-    },
-    maze,
-    player = {
-      location: {
-        x: 1,
-        y: 1
-      }
-    },
-    other = {
-      data: [],
-      render: {}
-    },
-    socket = io();
+  var Amazeing = function(){
+    var self = {
+          stage: null,
+          renderer: null,
+          hero: null,
+          blockTexture: null,
+          otherTexture: null,
+          heroTexture: null,
+          bounds: {
+            height: $(window).height(),
+            width: $(window).width()
+          },
+          maze: null,
+          player: {
+            location: {
+              x: CONFIG.start.x,
+              y: CONFIG.start.y
+            }
+          },
+          other: {
+            data: [],
+            render: {}
+          }
+       };
 
-  socket.on('map_rerender', function(map) {
-    maze = map;
-    drawMap();
-  });
+    self.onUpdateMap = function(data) {
+      self.maze = data;
 
-  socket.on('player_update', function(data) {
-    player = data;
-  });
+      for (var i = 0; i < self.maze.length; i += 1) {
+        for (var j = 0; j < self.maze[i].length; j += 1) {
+          if (self.maze[i][j].sprite === CONFIG.tags.wall) {
+            var newBlock = new PIXI.Sprite(self.blockTexture);
 
-  socket.on('other_update', function(data) {
-    other.data = data;
-    drawOther();
-  });
+            newBlock.height = CONFIG.tile.height;
+            newBlock.width = CONFIG.tile.width;
+            newBlock.position.y = j * CONFIG.tile.height;
+            newBlock.position.x = i * CONFIG.tile.width;
 
-  // Controls, powered by KeyboardJS
-  KeyboardJS.on('up', function() {
-    socket.emit('player_move', 'up');
-  });
-
-  KeyboardJS.on('right', function() {
-    socket.emit('player_move', 'right');
-  });
-
-  KeyboardJS.on('down', function() {
-    socket.emit('player_move', 'down');
-  });
-
-  KeyboardJS.on('left', function() {
-    socket.emit('player_move', 'left');
-  });
-
-  var blockTexture = PIXI.Texture.fromImage('assets/block2.png'),
-    otherTexture = PIXI.Texture.fromImage('assets/grass.jpg'),
-    heroTexture = PIXI.Texture.fromImage('assets/block.png');
-
-  function drawMap() {
-    for (var i = 0; i < maze.length; i += 1) {
-      for (var j = 0; j < maze[i].length; j += 1) {
-        if (maze[i][j].sprite === 'wall_01') {
-          var newBlock = new PIXI.Sprite(blockTexture);
-          newBlock.height = 16;
-          newBlock.width = 16;
-          newBlock.position.x = i * 16;
-          newBlock.position.y = j * 16;
-          stage.addChild(newBlock);
-          renderer.render(stage);
+            self.stage.addChild(newBlock);
+            self.renderer.render(self.stage);
+          }
         }
       }
-    }
-  }
+    };
 
-  function drawOther() {
-    other.data.forEach(function(obj) {
-      var render;
-      if (other.render[obj.id]) {
-        render = other.render[obj.id];
-      } else {
-        render = other.render[obj.id] = new PIXI.Sprite(otherTexture);
-        render.height = 16;
-        render.width = 16;
-        stage.addChild(render);
-      }
-      render.position.x = obj.x * 16;
-      render.position.y = obj.y * 16;
-    });
-  }
+    self.onUpdateOther = function(data) {
+      self.other.data = data;
+      console.log(data);
+      self.other.data.forEach(function(obj) {
+        var render = null;
 
-  var stage = new PIXI.Stage(0);
-  var renderer = PIXI.autoDetectRenderer(bounds.width, bounds.height);
+        if (self.other.render[obj.id]) {
+          render = self.other.render[obj.id];
+        } else {
+          render = self.other.render[obj.id] = new PIXI.Sprite(self.otherTexture);
+          render.height = CONFIG.tile.height;
+          render.width = CONFIG.tile.width;
+          self.stage.addChild(render);
+        }
 
-  var hero = new PIXI.Sprite(heroTexture);
-  hero.height = 16;
-  hero.width = 16;
-  hero.position.x = player.location.x;
-  hero.position.y = player.location.y;
-  stage.addChild(hero);
+        render.position.y = obj.y * CONFIG.tile.height;
+        render.position.x = obj.x * CONFIG.tile.width;
+      });
+    };
 
-  renderer.render(stage);
+    self.onUpdatePlayer = function(data) {
+      self.player = data;
+    };
 
-  function update() {
-    hero.position.x = player.location.x * 16;
-    hero.position.y = player.location.y * 16;
+    self.updatePlayerSprite = function() {
+      self.hero.position.y = self.player.location.y * CONFIG.tile.height;
+      self.hero.position.x = self.player.location.x * CONFIG.tile.width;
 
-    renderer.render(stage);
+      self.renderer.render(self.stage);
+      requestAnimFrame(self.updatePlayerSprite);
+    };
 
-    requestAnimFrame(update);
-  }
+    self.setup = function() {
+      self.stage = new PIXI.Stage(0);
+      self.renderer = PIXI.autoDetectRenderer(self.bounds.width, self.bounds.height);
 
-  requestAnimFrame(update);
+      self.blockTexture = PIXI.Texture.fromImage(CONFIG.maps.block);
+      self.otherTexture = PIXI.Texture.fromImage(CONFIG.maps.enemy);
+      self.heroTexture = PIXI.Texture.fromImage(CONFIG.maps.hero);
 
-  $('#screen').append(renderer.view);
+      self.otherTexture.setFrame(new PIXI.Rectangle(0, 0, CONFIG.sprites.width, CONFIG.sprites.height));
+      self.otherTexture.noFrame = false;
 
-  socket.emit('connection', 'TonyMtz');
-})(PIXI, KeyboardJS, $, io, window);
+      self.heroTexture.setFrame(new PIXI.Rectangle(0, 0, CONFIG.sprites.width, CONFIG.sprites.height));
+      self.heroTexture.noFrame = false;
+
+      self.hero = new PIXI.Sprite(self.heroTexture);
+
+      self.hero.height = CONFIG.tile.height;
+      self.hero.width = CONFIG.tile.width;
+      self.hero.position.x = self.player.location.x;
+      self.hero.position.y = self.player.location.y;
+      self.stage.addChild(self.hero);
+
+      self.renderer.render(self.stage);
+
+      Sockets.connector.on(CONFIG.events.onMapRender, self.onUpdateMap);
+      Sockets.connector.on(CONFIG.events.onPlayerUpdate, self.onUpdatePlayer);
+      Sockets.connector.on(CONFIG.events.onOtherUpdate, self.onUpdateOther);
+    };
+
+    self.init = function() {
+      self.setup();
+
+      requestAnimFrame(self.updatePlayerSprite);
+
+      $('#screen').append(self.renderer.view);
+
+      Sockets.connect('TestPlayer');
+    };
+
+    return self;
+  }();
+
+  Amazeing.init();
+})(PIXI, CONFIG, Sockets, Controls, $, io, window);
