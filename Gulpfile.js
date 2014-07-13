@@ -13,11 +13,12 @@ var
 
 // Our paths, to make easier getting with our files
   paths = {
-    scripts: './app/js/**/*.js',
-    views: './app/views/**/*.jade',
-    styles: './app/styles/**/*.styl',
     assets: './app/assets/**/*.png', // png only, fck jpg!!
-    server: './server/**/*.js'
+    libs: './lib/*.js',
+    scripts: './app/js/**/*.js',
+    server: './server/**/*.js',
+    styles: './app/styles/**/*.styl',
+    views: './app/views/**/*.jade'
   };
 
 // Gulp's "internal" tasks definition
@@ -31,31 +32,31 @@ gulp.task('jade', function() {
 });
 
 gulp.task('compress', function() {
-  gulp.src('lib/*.js')
+  gulp.src(paths.libs)
     .pipe(uglify({outSourceMap: true}))
     .pipe(gulp.dest('dist'));
 });
 
 gulp.task('scripts', function() {
-  gulp.src('./app/js/*.js')
+  gulp.src(paths.scripts)
     .pipe(uglify({outSourceMap: true}))
     .pipe(gulp.dest('./build/js'));
 });
 
 gulp.task('lint', function() {
-  gulp.src('./app/js/*.js')
+  gulp.src(paths.scripts)
     .pipe(jshint())
     .pipe(jshint.reporter(stylish));
 });
 
 gulp.task('stylus', function () {
-  gulp.src('./app/styles/style.styl')
+  gulp.src(paths.styles)
     .pipe(stylus())
     .pipe(gulp.dest('./build/css'));
 });
 
 gulp.task('copy-assets', function() {
-  gulp.src(['./app/assets/*'])
+  gulp.src(paths.assets)
     .pipe(gulp.dest('./build/assets'));
 });
 
