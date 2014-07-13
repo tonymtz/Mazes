@@ -22,6 +22,9 @@
         "PIXI": false,
         "io": false,
         "$": false,
-        "KeyboardJS": false
+        "KeyboardJS": false,
+        "CONFIG": false,
+        "Controls": false,
+        "Sockets": false
     }
 }

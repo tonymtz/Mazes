@@ -1,7 +1,7 @@
 ;(function(io, window) {
   'use strict';
 
-  var Sockets = function(){
+  var Sockets = (function(){
     var self = {
         connector: null
       };
@@ -16,7 +16,7 @@
     };
 
     return self;
-  }();
+  }());
 
   Sockets.init();
 

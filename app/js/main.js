@@ -2,7 +2,7 @@
 ;(function(PIXI, CONFIG, Sockets, Controls, $, io, window) {
   'use strict';
 
-  var Amazeing = function(){
+  var Amazeing = (function(){
     var self = {
           stage: null,
           renderer: null,
@@ -119,7 +119,7 @@
     };
 
     return self;
-  }();
+  }());
 
   Amazeing.init();
 })(PIXI, CONFIG, Sockets, Controls, $, io, window);

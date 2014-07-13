@@ -39,7 +39,7 @@ gulp.task('compress', function() {
 
 gulp.task('scripts', function() {
   gulp.src(paths.scripts)
-    //.pipe(uglify({outSourceMap: true}))
+    .pipe(uglify({outSourceMap: true}))
     .pipe(gulp.dest('./build/js'));
 });
 

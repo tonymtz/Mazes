@@ -1,7 +1,7 @@
 ;(function(KeyboardJS, Sockets, window) {
   'use strict';
 
-  var Controls = function(){
+  var Controls = (function(){
     var self = {
       onPlayerMove: CONFIG.events.onPlayerMove
     };
@@ -30,7 +30,7 @@
     };
 
     return self;
-  }().init();
+  }()).init();
 
   window.Controls = Controls;
 })(KeyboardJS, Sockets, window);
