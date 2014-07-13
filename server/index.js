@@ -11,7 +11,7 @@
 
   require('./events')(http);
 
-  http.listen(config.port, config.ip, function() {
+  http.listen(config.port, function() {
     console.log('There is an Amazeing thing running on %d', http.address().port);
   });
 })(module || this);
