@@ -23,6 +23,7 @@
       enemy: 'assets/enemy.png'
     },
     keys: {
+      none: '',
       up: 'up',
       left: 'left',
       right: 'right',
