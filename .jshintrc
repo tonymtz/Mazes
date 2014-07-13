@@ -19,7 +19,9 @@
     "globals": {
         "console": false,
         "window": false,
-        "Phaser": false,
-        "$": false
+        "PIXI": false,
+        "io": false,
+        "$": false,
+        "KeyboardJS": false
     }
 }

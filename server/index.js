@@ -1,103 +1,85 @@
 'use strict';
 
-function nextInt(max) {
-  return Math.floor(Math.random() * max);
-}
-
-function MazeGenerator(height, width) {
-  var maze = [];
-  for (var i = 0; i < height; i += 1) {
-    maze[i] = [];
-    for (var j = 0; j < width; j += 1) {
-      maze[i][j] = 1;
-    }
-  }
-  var row = nextInt(height);
-  while (row % 2 === 0) {
-    row = nextInt(height);
-  }
-  var column = nextInt(width);
-  while (column % 2 === 0) {
-    column = nextInt(width);
-  }
-  maze[row][column] = 0;
-  recursion(row, column, maze, height, width);
-  return maze;
-}
-
-function randomDirections() {
-  function shuffle(o){
-    for (var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-      return o;
-  }
-  var randoms = [];
-  for (var i = 0; i < 4; i+=1) {
-    randoms.push(i + 1);
-  }
-  return shuffle(randoms);
-}
-
-function recursion(row, col, maze, height, width) {
-  var randDirs = randomDirections();
-  // var randDirs = [1,2,3,4];
-  for (var i = 0; i < randDirs.length; i++) {
-    switch (randDirs[i]) {
-      case 1: // up
-        if (row - 2 < 0) {
-          continue;
-        }
-        if (maze[row - 2][col] !== 0) {
-          maze[row - 2][col] = 0;
-          maze[row - 1][col] = 0;
-          recursion(row - 2, col, maze, height, width);
-        }
-        break;
-      case 2: // right
-        if (col + 2 > width - 1) {
-          continue;
-        }
-        if (maze[row][col + 2] !== 0) {
-          maze[row][col + 2] = 0;
-          maze[row][col + 1] = 0;
-          recursion(row, col + 2, maze, height, width);
-        }
-        break;
-      case 3: // down
-        if (row + 2 > height - 1) {
-          continue;
-        }
-        if (maze[row + 2][col] !== 0) {
-          maze[row + 2][col] = 0;
-          maze[row + 1][col] = 0;
-          recursion(row + 2, col, maze, height, width);
-        }
-        break;
-      case 4: // left
-        if (col - 2 <= 0) {
-          continue;
-        }
-        if (maze[row][col - 2] !== 0) {
-          maze[row][col - 2] = 0;
-          maze[row][col - 1] = 0;
-          recursion(row, col - 2, maze, height, width);
-        }
-        break;
-    }
-  }
-}
-
 var express = require('express'),
   app = express(),
+  http = require('http').Server(app),
+  io = require('socket.io')(http),
   port = process.env.OPENSHIFT_NODEJS_PORT || 8080,
-  ip = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+  ip = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1',
+  Player = require('./models/player'),
+  Room = require('./models/room'),
+  //= ===== tmp
+  myRoom,
+  Maze = require('./models/maze'),
+  players = {},
+  clients = [];
 
-app.get('/maze', function(req, res){
-  var maze = new MazeGenerator(31, 31);
+app.get('/maze', function(req, res) {
+  var maze = new Maze(15, 15);
   res.jsonp(maze);
 });
 
 app.use(express.static(__dirname + './../build'));
 
-var server = app.listen(port, ip, function() {
-  console.log('Listening on port %d', server.address().port);
+io.on('connection', function(socket) {
+  var player = new Player(socket.id, socket.id);
+  clients.push(socket);
+  players[socket.id] = player;
+  player.enterRoom(myRoom);
+
+  socket.on('disconnect', function() {
+    var index = clients.indexOf(socket);
+    if (index != -1) {
+      clients.splice(index, 1);
+      delete players[socket.id];
+      updateAll();
+      console.info('Client gone (id=' + socket.id + ').');
+    }
+  });
+
+  socket.on('player_move', function(dir) {
+    var player = players[socket.id],
+      index = clients.indexOf(socket),
+      other = clients.slice(0);
+    other.splice(index, 1);
+
+    player.move(dir);
+
+    var update = {
+      name: player.name,
+      location: {
+        x: player.location.x,
+        y: player.location.y
+      }
+    };
+
+    socket.emit('player_update', update);
+    updateAll();
+    console.info(player.id + ' has moved!');
+  });
+
+  function updateAll() {
+    clients.forEach(function(client) {
+      var otherArray = [];
+      for (var player in players) {
+        if (client.id != players[player].id) {
+          otherArray.push({
+            id: players[player].id,
+            x: players[player].location.x,
+            y: players[player].location.y
+          })
+        }
+      }
+      if (otherArray.length > 0) {
+        client.emit('other_update', otherArray);
+      }
+    });
+  };
+
+  io.emit('map_rerender', myRoom.print());
+});
+
+http.listen(port, ip, function() {
+  myRoom = new Room(15, 15);
+  console.log('Listening on port %d', http.address().port);
 });
