@@ -1,0 +1,10 @@
+block content
+#windows.overlay
+  .login.visible.window
+    h1 Login
+    form(action="#")
+      label
+        span Username:
+        input(type="text", id="userName" value="", placeholder="username", maxlength="16")
+      button(onclick="Amazeing.login()")
+        | Login
