@@ -2,7 +2,7 @@
 (function(module) {
   'use strict';
 
-  var config = require('./config/development.json'),
+  var config = require('./config/' + process.env.NODE_ENV || 'development' + '.json'),
     express = require('express'),
     app = express(),
     http = require('http').Server(app);
