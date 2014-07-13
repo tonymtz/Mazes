@@ -4,6 +4,8 @@
 
   var Amazeing = (function(){
     var self = {
+          $container: null,
+          $windows: null,
           stage: null,
           renderer: null,
           hero: null,
@@ -102,24 +104,35 @@
       self.stage.addChild(self.hero);
 
       self.renderer.render(self.stage);
+      requestAnimFrame(self.updatePlayerSprite);
 
       Sockets.connector.on(CONFIG.events.onMapRender, self.onUpdateMap);
       Sockets.connector.on(CONFIG.events.onPlayerUpdate, self.onUpdatePlayer);
       Sockets.connector.on(CONFIG.events.onOtherUpdate, self.onUpdateOther);
     };
 
+    self.login = function() {
+      var $username = $('#userName')[0].value;
+
+      if($username) {
+        self.$windows.hide();
+        self.$container.append(self.renderer.view);
+        Sockets.connect($username);
+      }
+
+      return false;
+    };
+
     self.init = function() {
+      self.$windows = $('#windows');
+      self.$container = $('#screen');
       self.setup();
-
-      requestAnimFrame(self.updatePlayerSprite);
-
-      $('#screen').append(self.renderer.view);
-
-      Sockets.connect('TestPlayer');
     };
 
     return self;
   }());
 
-  Amazeing.init();
+  $(Amazeing.init);
+
+  window.Amazeing = Amazeing;
 })(PIXI, CONFIG, Sockets, Controls, $, io, window);
