@@ -34,6 +34,9 @@
       onPlayerMove: 'player_move',
       onPlayerUpdate: 'player_update',
       onOtherUpdate: 'other_update'
+    },
+    intervals: {
+      keyInterval: 150
     }
   });
 

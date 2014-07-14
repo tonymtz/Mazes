@@ -25,6 +25,9 @@
         "KeyboardJS": false,
         "CONFIG": false,
         "Controls": false,
-        "Sockets": false
+        "Sockets": false,
+        "document": true,
+        "setInterval": true,
+        "clearInterval": true
     }
 }
