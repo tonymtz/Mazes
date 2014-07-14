@@ -33,7 +33,14 @@ $ gulp build
 
 To run on development mode
 ```bash
-$ gulp
+$ gulp dev
+```
+
+By default gulp will __build__ the project.
+
+To deploy, set the following environment var on __staging__
+```bash
+$ export NODE_ENV=staging
 ```
 
 ### Rules to add code ###

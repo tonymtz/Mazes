@@ -1,2 +1,3 @@
 killall node
-node server.js &
+forever start /home/codeship/amazeing/server.js
+@restart /usr/local/bin/forever start /home/codeship/amazeing/server.js
