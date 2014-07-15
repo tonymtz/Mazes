@@ -30,17 +30,25 @@
     self.onUpdateMap = function(data) {
       self.maze = data;
 
+      for (var index = self.stage.children.length - 1; index >= 0; index--) {
+        var sprite = self.stage.children[index];
+        if(sprite.tag === CONFIG.tags.wall || sprite.tag === CONFIG.tags.char) {
+          self.stage.removeChild(sprite);
+        }
+      }
+
       for (var i = 0; i < self.maze.length; i += 1) {
         for (var j = 0; j < self.maze[i].length; j += 1) {
           if (self.maze[i][j].sprite === CONFIG.tags.wall) {
-            var newBlock = new PIXI.Sprite(self.blockTexture);
+            var wall = new PIXI.Sprite(self.blockTexture);
 
-            newBlock.height = CONFIG.tile.height;
-            newBlock.width = CONFIG.tile.width;
-            newBlock.position.y = j * CONFIG.tile.height;
-            newBlock.position.x = i * CONFIG.tile.width;
+            wall.height = CONFIG.tile.height;
+            wall.width = CONFIG.tile.width;
+            wall.position.y = j * CONFIG.tile.height;
+            wall.position.x = i * CONFIG.tile.width;
+            wall.tag = CONFIG.tags.wall;
 
-            self.stage.addChild(newBlock);
+            self.stage.addChild(wall);
             self.renderer.render(self.stage);
           }
         }
@@ -49,21 +57,23 @@
 
     self.onUpdateOther = function(data) {
       self.other.data = data;
-      console.log(data);
+
       self.other.data.forEach(function(obj) {
-        var render = null;
+        var char = null;
 
         if (self.other.render[obj.id]) {
-          render = self.other.render[obj.id];
+          char = self.other.render[obj.id];
         } else {
-          render = self.other.render[obj.id] = new PIXI.Sprite(self.otherTexture);
-          render.height = CONFIG.tile.height;
-          render.width = CONFIG.tile.width;
-          self.stage.addChild(render);
+          char = self.other.render[obj.id] = new PIXI.Sprite(self.otherTexture);
+          char.height = CONFIG.tile.height;
+          char.width = CONFIG.tile.width;
+          char.tag = CONFIG.tags.char;
+
+          self.stage.addChild(char);
         }
 
-        render.position.y = obj.y * CONFIG.tile.height;
-        render.position.x = obj.x * CONFIG.tile.width;
+        char.position.y = obj.y * CONFIG.tile.height;
+        char.position.x = obj.x * CONFIG.tile.width;
       });
     };
 
@@ -99,6 +109,7 @@
       self.hero.width = CONFIG.tile.width;
       self.hero.position.x = self.player.location.x;
       self.hero.position.y = self.player.location.y;
+      self.hero.tag = CONFIG.tags.player;
       self.stage.addChild(self.hero);
 
       self.renderer.render(self.stage);
