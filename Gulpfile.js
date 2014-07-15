@@ -1,95 +1,108 @@
 var
 // Libs, very important stuff
-  gulp = require('gulp'),
-  jade = require('gulp-jade'),
-  clean = require('gulp-clean'),
-  stylus = require('gulp-stylus'),
-  uglify = require('gulp-uglify'),
+  gulp       = require('gulp'),
+  gutil      = require('gulp-util'),
+  jade       = require('gulp-jade'),
+  clean      = require('gulp-clean'),
+  stylus     = require('gulp-stylus'),
+  uglify     = require('gulp-uglify'),
   livereload = require('gulp-livereload'),
-  jshint = require('gulp-jshint'),
-  stylish = require('jshint-stylish'),
-  spawn = require('child_process').spawn,
-  node,
+  browserify = require('gulp-browserify'),
+  nodemon    = require('gulp-nodemon'),
+  jshint     = require('gulp-jshint'),
+  stylish    = require('jshint-stylish'),
 
 // Our paths, to make easier getting with our files
   paths = {
-    assets: './app/assets/**/*.png', // png only, fck jpg!!
-    libs: './lib/*.js',
-    scripts: './app/js/**/*.js',
-    server: './server/**/*.js',
-    styles: './app/styles/**/*.styl',
-    views: './app/views/**/*.jade'
+    main    : 'server.js',
+    server  : 'server/**/*',
+    client  : {
+      assets   : 'app/assets/**/*',
+      mainView : 'app/styles/style.styl',
+      scripts  : 'app/js/**/*.js',
+      styles   : 'app/styles/**/*.styl',
+      vendors  : 'app/vendor/**/*',
+      views    : 'app/views/**/*.jade'
+    },
+    build   : {
+      base     : 'build',
+      assets   : 'build/assets',
+      scripts  : 'build/js',
+      styles   : 'build/css',
+      vendors  : 'build/vendor'
+    }
   };
 
 // Gulp's "internal" tasks definition
 gulp.task('jade', function() {
-  gulp.src(paths.views)
-  .pipe(jade({
-    pretty: true,
-    basedir:'./app/views'
-  }))
-  .pipe(gulp.dest('./build'));
-});
-
-gulp.task('compress', function() {
-  gulp.src(paths.libs)
-    .pipe(uglify({outSourceMap: true}))
-    .pipe(gulp.dest('dist'));
+  return gulp.src(paths.client.views)
+    .pipe(jade({ pretty: true }))
+    .pipe(gulp.dest('build'));
 });
 
 gulp.task('scripts', function() {
-  gulp.src(paths.scripts)
-    .pipe(uglify({outSourceMap: true}))
-    .pipe(gulp.dest('./build/js'));
+  return gulp.src(paths.client.scripts)
+    .pipe(browserify({
+      basedir: 'build/js/',
+      debug  : !gutil.env.development
+    }))
+    .pipe(gulp.dest(paths.build.scripts));
+});
+
+gulp.task('scripts-uglified', function() {
+  return gulp.src(paths.client.scripts)
+    .pipe(uglify({ outSourceMap: true }))
+    .pipe(browserify({
+      basedir: 'build/js/',
+      debug  : !gutil.env.staging
+    }))
+    .pipe(gulp.dest(paths.build.scripts));
 });
 
 gulp.task('lint', function() {
-  gulp.src(paths.scripts)
+  return gulp.src(paths.client.scripts)
     .pipe(jshint())
     .pipe(jshint.reporter(stylish));
 });
 
-gulp.task('stylus', function () {
-  gulp.src(paths.styles)
-    .pipe(stylus())
-    .pipe(gulp.dest('./build/css'));
+gulp.task('stylus', function() {
+  return gulp.src(paths.client.mainView)
+    .pipe(stylus({ pretty: true }))
+    .pipe(gulp.dest(paths.build.styles));
 });
 
-gulp.task('copy-assets', function() {
-  gulp.src(paths.assets)
-    .pipe(gulp.dest('./build/assets'));
+gulp.task('assets', function() {
+  return gulp.src(paths.client.assets)
+    .pipe(gulp.dest(paths.build.assets));
 });
 
-gulp.task('server', function() {
-  if (node) node.kill()
-  node = spawn('node', ['server/index.js'], {stdio: 'inherit'})
-  node.on('close', function (code) {
-    if (code === 8) {
-      console.log('Error detected, waiting for changes...');
-    }
-  });
+gulp.task('vendor', function() {
+  return gulp.src(paths.client.vendors)
+    .pipe(gulp.dest(paths.build.vendors));
+});
+
+gulp.task('serve', ['build'], function() {
+  return nodemon({ script: paths.main });
 });
 
 gulp.task('clean', function() {
-  gulp.src('app/tmp', {read: false})
+  gulp.src('build', { read: false })
     .pipe(clean());
 });
 
 // Here goes our important tasks... our "macros"
-gulp.task('build', ['stylus', 'jade', 'lint', 'scripts', 'copy-assets']);
-gulp.task('default', ['server', 'build', 'watch']);
+gulp.task('build', ['lint', 'stylus', 'jade', 'scripts', 'assets', 'vendor']);
+gulp.task('dev', ['build', 'serve', 'watch']);
+gulp.task('default', ['build']);
 
 // Watcher
-gulp.task('watch', function() {
+gulp.task('watch', ['serve'], function() {
+  var all_built_files = paths.build.base + '/**/*';
+  gulp.watch(paths.client.assets, ['assets']);
+  gulp.watch(paths.client.views, ['jade']);
+  gulp.watch(paths.client.scripts, ['lint', 'scripts']);
+  gulp.watch(paths.client.styles, ['stylus']);
   livereload.listen();
-  gulp.watch(paths.styles, ['stylus']).on('change', livereload.changed);
-  gulp.watch(paths.views, ['jade']).on('change', livereload.changed);
-  gulp.watch(paths.scripts, ['scripts']).on('change', livereload.changed);
-  gulp.watch(paths.assets, ['copy-assets']).on('change', livereload.changed);
-  gulp.watch(paths.server, ['server']);
-});
-
-// Clean up if an error goes unhandled.
-process.on('exit', function() {
-    if (node) node.kill()
+  return gulp.watch([all_built_files, paths.server, paths.main])
+    .on('change', livereload.changed);
 });

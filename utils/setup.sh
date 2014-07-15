@@ -1,2 +1,3 @@
 killall node
-node server.js &
+export NODE_ENV=staging
+forever start /home/codeship/amazeing/server.js

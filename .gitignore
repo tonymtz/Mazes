@@ -3,3 +3,4 @@
 .iml
 build/
 node_modules/
+app/vendor/
