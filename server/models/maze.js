@@ -8,7 +8,7 @@
     return Math.floor(Math.random() * max);
   }
 
-  function MazeGenerator(height, width, multiplicator) {
+  function MazeGenerator(height, width, multiplicator, exits) {
     var maze = [];
     for (var i = 0; i < height; i += 1) {
       maze[i] = [];
@@ -26,7 +26,11 @@
     }
     maze[row][column] = 0;
     generateWorld(row, column, maze, height, width, 2);
-    // addExit(maze, width, height, 2);
+
+    if (exits > 0 && exits < 5) {
+      addExit(maze, width, height, exits);
+    }
+
     maze = growIt(maze, multiplicator);
     replaceForObjects(maze);
     return maze;
@@ -150,6 +154,7 @@
    * @exits - number of exits [1-4]
    */
   function addExit(maze, width, height, exits) {
+    var randDirs = randomDirections();
     if (typeof exits !== 'number' || exits > 4) return;
     for (var i = 0; i < exits; i += 1) {
       var xHalf = Math.floor(width / 2);
@@ -171,7 +176,5 @@
     }
   }
 
-  module.exports = function(height, width, multiplicator) {
-    return new MazeGenerator(height, width, multiplicator);
-  };
+  module.exports = MazeGenerator;
 })(module || this);

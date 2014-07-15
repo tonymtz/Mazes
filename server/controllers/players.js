@@ -17,14 +17,27 @@
       if (!playersList[id]) {
         playersList[id] = new Player(id, 'Monkey');
       }
+      return playersList[id];
     },
     delete: function (id) {
       delete playersList[id];
     },
     move: function(id, dir) {
       var player = playersList[id],
-        maze = rooms.get(player.room).maze;
-      player = player.move(maze, dir);
+        room = rooms.get(player.room),
+        maze = room.maze,
+        result = player.move(maze, dir);
+      console.log('player: ', player.id);
+      console.log('room: ', player.room);
+      if (result === 2) {
+        console.log(' = warpeando = ');
+        var nextRoom = maze[dir];
+        if (!nextRoom) {
+          nextRoom = rooms.generateNextFor(room.id, dir);
+        }
+        rooms.deletePlayerFromRoom(player.room, player.id);
+        rooms.addPlayer2Room(nextRoom.id, player.id);
+      }
       return {
         name: player.name,
         location: {

@@ -4,6 +4,7 @@
 
   module.exports = function(http) {
     var io = require('socket.io')(http),
+      _ = require('underscore'),
       players = require('./controllers/players'),
       rooms = require('./controllers/rooms'),
       clients = [];
@@ -22,7 +23,9 @@
       });
 
       socket.on('disconnect', function() {
-        var index = clients.indexOf(socket.id);
+        var player = players.get(socket.id),
+          index = clients.indexOf(socket.id);
+        rooms.deletePlayerFromRoom(player.room, player.id);
         if (index >= 0) {
           clients.splice(index, 1);
         }
@@ -34,8 +37,12 @@
       io.emit('map_rerender', rooms.get(players.get(socket.id).room).maze);
 
       function updateAll() {
-        clients.forEach(function(client) {
-          var otherArray = [],
+        var player = players.get(socket.id),
+          room = rooms.get(player.room);
+
+        room.players.forEach(function(playerId) {
+          var client = _.find(clients, function(client) { return client.id === playerId }),
+            otherArray = [],
             playersList = players.getAll();
           for (var player in playersList) {
             if (client.id != playersList[player].id) {

@@ -14,40 +14,46 @@
       };
     };
 
-  function checkCollision(other) {
+  Player.prototype._checkCollision = function(maze, x, y) {
+    var other;
+    if (maze[x] === undefined || maze[x][y] === undefined) {
+      return true;
+    }
+    other = maze[x][y];
     return other.type === 'wall';
   }
 
   Player.prototype.move = function(maze, dir) {
     var x = this.location.x,
       y = this.location.y;
+
     switch(dir) {
-      case 'left':
-        if (checkCollision(maze[x - 1][y])) break;
-        maze[x][y] = 0;
-        this.location.x -= 1;
-        maze[this.location.x][y] = 9;
-        break;
-      case 'right':
-        if (checkCollision(maze[x + 1][y])) break;
-        maze[x][y] = 0;
-        this.location.x += 1;
-        maze[this.location.x][y] = 9;
-        break;
-      case 'down':
-        if (checkCollision(maze[x][y + 1])) break;
-        maze[x][y] = 0;
-        this.location.y += 1;
-        maze[x][this.location.y] = 9;
-        break;
       case 'up':
-        if (checkCollision(maze[x][y - 1])) break;
+        if (this._checkCollision(maze, x, y - 1)) break;
         maze[x][y] = 0;
         this.location.y -= 1;
         maze[x][this.location.y] = 9;
-        break;
+        return 1;
+      case 'right':
+        if (this._checkCollision(maze, x + 1, y)) break;
+        maze[x][y] = 0;
+        this.location.x += 1;
+        maze[this.location.x][y] = 9;
+        return 1;
+      case 'down':
+        if (this._checkCollision(maze, x, y + 1)) break;
+        maze[x][y] = 0;
+        this.location.y += 1;
+        maze[x][this.location.y] = 9;
+        return 1;
+      case 'left':
+        if (this._checkCollision(maze, x - 1, y)) break;
+        maze[x][y] = 0;
+        this.location.x -= 1;
+        maze[this.location.x][y] = 9;
+        return 1;
     }
-    return this;
+    return 2;
   };
 
   module.exports = Player;
