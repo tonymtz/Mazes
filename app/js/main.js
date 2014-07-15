@@ -30,6 +30,13 @@
     self.onUpdateMap = function(data) {
       self.maze = data;
 
+      for (var index = self.stage.children.length - 1; index >= 0; index--) {
+        var sprite = self.stage.children[index];
+        if(sprite.tag === CONFIG.tags.wall || sprite.tag === CONFIG.tags.char) {
+          self.stage.removeChild(sprite);
+        }
+      }
+
       for (var i = 0; i < self.maze.length; i += 1) {
         for (var j = 0; j < self.maze[i].length; j += 1) {
           if (self.maze[i][j].sprite === CONFIG.tags.wall) {
@@ -39,6 +46,7 @@
             newBlock.width = CONFIG.tile.width;
             newBlock.position.y = j * CONFIG.tile.height;
             newBlock.position.x = i * CONFIG.tile.width;
+            newBlock.tag = CONFIG.tags.wall;
 
             self.stage.addChild(newBlock);
             self.renderer.render(self.stage);
@@ -59,6 +67,8 @@
           render = self.other.render[obj.id] = new PIXI.Sprite(self.otherTexture);
           render.height = CONFIG.tile.height;
           render.width = CONFIG.tile.width;
+          render.tag = CONFIG.tags.char;
+
           self.stage.addChild(render);
         }
 
@@ -99,6 +109,7 @@
       self.hero.width = CONFIG.tile.width;
       self.hero.position.x = self.player.location.x;
       self.hero.position.y = self.player.location.y;
+      self.hero.tag = CONFIG.tags.player;
       self.stage.addChild(self.hero);
 
       self.renderer.render(self.stage);
