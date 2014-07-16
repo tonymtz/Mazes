@@ -17,21 +17,17 @@
       if (!playersList[id]) {
         playersList[id] = new Player(id, 'Monkey');
       }
+      return playersList[id];
     },
     delete: function (id) {
       delete playersList[id];
     },
     move: function(id, dir) {
       var player = playersList[id],
-        maze = rooms.get(player.room).maze;
-      player = player.move(maze, dir);
-      return {
-        name: player.name,
-        location: {
-          x: player.location.x,
-          y: player.location.y
-        }
-      };
+        room = rooms.get(player.room),
+        maze = room.maze,
+        nextToDo = player.move(maze, dir);
+      return nextToDo;
     },
     enter2Room: function(playerId, roomId) {
       var player = playersList[playerId];

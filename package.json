@@ -4,7 +4,8 @@
   "description": "An ambitious massively multiplayer online role-playing game made with javascript",
   "dependencies": {
     "express": "~4.5.0",
-    "socket.io": "~1.0.6"
+    "socket.io": "~1.0.6",
+    "underscore": "~1.6.0"
   },
   "repository": {
     "type": "git",
