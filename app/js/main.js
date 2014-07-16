@@ -5,6 +5,7 @@
   var Amazeing = (function(){
     var self = {
           container: $('#container'),
+          map: null,
           stage: null,
           renderer: null,
           hero: null,
@@ -49,7 +50,7 @@
             wall.position.x = i * CONFIG.tile.width;
             wall.tag = CONFIG.tags.wall;
 
-            self.stage.addChild(wall);
+            self.map.addChild(wall);
             self.renderer.render(self.stage);
           }
         }
@@ -72,7 +73,7 @@
           char.width = CONFIG.tile.width;
           char.tag = CONFIG.tags.char;
 
-          self.stage.addChild(char);
+          self.map.addChild(char);
         }
 
         char.position.y = obj.y * CONFIG.tile.height;
@@ -82,6 +83,8 @@
 
     self.onUpdatePlayer = function(data) {
       self.player = data;
+      self.map.position.x = Math.round(self.bounds.width / 2)-self.player.location.x * CONFIG.tile.height;
+      self.map.position.y = Math.round(self.bounds.height / 2)-self.player.location.y * CONFIG.tile.width;
     };
 
     self.updatePlayerSprite = function() {
@@ -94,6 +97,7 @@
 
     self.setup = function() {
       self.stage = new PIXI.Stage(0);
+      self.map = new PIXI.DisplayObjectContainer();
 
       self.bounds.height = self.container.height();
       self.bounds.width = self.container.width();
@@ -116,7 +120,9 @@
       self.hero.position.x = self.player.location.x;
       self.hero.position.y = self.player.location.y;
       self.hero.tag = CONFIG.tags.player;
-      self.stage.addChild(self.hero);
+      self.map.addChild(self.hero);
+
+      self.stage.addChild(self.map);
 
       self.renderer.render(self.stage);
 
