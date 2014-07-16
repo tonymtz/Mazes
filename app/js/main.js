@@ -4,6 +4,7 @@
 
   var Amazeing = (function(){
     var self = {
+          container: $('#container'),
           stage: null,
           renderer: null,
           hero: null,
@@ -11,8 +12,8 @@
           otherTexture: null,
           heroTexture: null,
           bounds: {
-            height: $(window).height(),
-            width: $(window).width()
+            height: null,
+            width: null
           },
           maze: null,
           player: {
@@ -91,15 +92,18 @@
 
     self.setup = function() {
       self.stage = new PIXI.Stage(0);
+
+      self.bounds.height = self.container.height();
+      self.bounds.width = self.container.width();
+
       self.renderer = PIXI.autoDetectRenderer(self.bounds.width, self.bounds.height);
 
       self.blockTexture = PIXI.Texture.fromImage(CONFIG.maps.block);
       self.otherTexture = PIXI.Texture.fromImage(CONFIG.maps.enemy);
-      self.heroTexture = PIXI.Texture.fromImage(CONFIG.maps.hero);
-
       self.otherTexture.setFrame(new PIXI.Rectangle(0, 0, CONFIG.sprites.width, CONFIG.sprites.height));
       self.otherTexture.noFrame = false;
 
+      self.heroTexture = PIXI.Texture.fromImage(CONFIG.maps.hero);
       self.heroTexture.setFrame(new PIXI.Rectangle(0, 0, CONFIG.sprites.width, CONFIG.sprites.height));
       self.heroTexture.noFrame = false;
 
@@ -114,19 +118,21 @@
 
       self.renderer.render(self.stage);
 
+      requestAnimFrame(self.updatePlayerSprite);
+
+      self.container.append(self.renderer.view);
+    };
+
+    self.bind = function() {
       Sockets.connector.on(CONFIG.events.onMapRender, self.onUpdateMap);
       Sockets.connector.on(CONFIG.events.onPlayerUpdate, self.onUpdatePlayer);
       Sockets.connector.on(CONFIG.events.onOtherUpdate, self.onUpdateOther);
+      Sockets.connect('TestPlayer');
     };
 
     self.init = function() {
       self.setup();
-
-      requestAnimFrame(self.updatePlayerSprite);
-
-      $('#screen').append(self.renderer.view);
-
-      Sockets.connect('TestPlayer');
+      self.bind();
     };
 
     return self;
