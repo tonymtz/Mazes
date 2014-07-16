@@ -32,10 +32,10 @@
     self.onUpdateMap = function(data) {
       self.maze = data;
 
-      for (var index = self.stage.children.length - 1; index >= 0; index--) {
-        var sprite = self.stage.children[index];
+      for (var index = self.map.children.length - 1; index >= 0; index--) {
+        var sprite = self.map.children[index];
         if(sprite.tag === CONFIG.tags.wall || sprite.tag === CONFIG.tags.char) {
-          self.stage.removeChild(sprite);
+          self.map.removeChild(sprite);
         }
       }
 
@@ -85,6 +85,8 @@
       self.player = data;
       self.map.position.x = Math.round(self.bounds.width / 2)-self.player.location.x * CONFIG.tile.height;
       self.map.position.y = Math.round(self.bounds.height / 2)-self.player.location.y * CONFIG.tile.width;
+
+      self.map.visible = true;
     };
 
     self.updatePlayerSprite = function() {
@@ -121,6 +123,7 @@
       self.hero.position.y = self.player.location.y;
       self.hero.tag = CONFIG.tags.player;
       self.map.addChild(self.hero);
+      self.map.visible = false;
 
       self.stage.addChild(self.map);
 
