@@ -26,25 +26,8 @@
       var player = playersList[id],
         room = rooms.get(player.room),
         maze = room.maze,
-        result = player.move(maze, dir);
-      console.log('player: ', player.id);
-      console.log('room: ', player.room);
-      if (result === 2) {
-        console.log(' = warpeando = ');
-        var nextRoom = maze[dir];
-        if (!nextRoom) {
-          nextRoom = rooms.generateNextFor(room.id, dir);
-        }
-        rooms.deletePlayerFromRoom(player.room, player.id);
-        rooms.addPlayer2Room(nextRoom.id, player.id);
-      }
-      return {
-        name: player.name,
-        location: {
-          x: player.location.x,
-          y: player.location.y
-        }
-      };
+        nextToDo = player.move(maze, dir);
+      return nextToDo;
     },
     enter2Room: function(playerId, roomId) {
       var player = playersList[playerId];

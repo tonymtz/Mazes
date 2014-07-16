@@ -16,10 +16,32 @@
       console.info('CONN: %s', socket.id);
 
       socket.on('player_move', function(dir) {
-        var update = players.move(socket.id, dir);
-        socket.emit('player_update', update);
+        var player = players.get(socket.id),
+          nextToDo = players.move(player.id, dir),
+          update;
+        if (nextToDo === 1) { // Walking
+          update = {
+            name: player.name,
+            location: {
+              x: player.location.x,
+              y: player.location.y
+            }
+          };
+          socket.emit('player_update', update);
+        } else if (nextToDo === 2) { // Warping
+          updateAll();
+          var room = rooms.get(player.room),
+            nextRoom = room.neighbors[dir];
+          if (!nextRoom) {
+            nextRoom = rooms.generateNextFor(room.id, dir).id;
+          }
+          rooms.deletePlayerFromRoom(player.room, player.id);
+          rooms.addPlayer2Room(nextRoom, player.id);
+          player.room = nextRoom;
+          socket.emit('map_rerender', rooms.get(player.room).maze);
+        }
         updateAll();
-        console.info('MOVE: %s', socket.id);
+        // console.info('MOVE: %s', socket.id);
       });
 
       socket.on('disconnect', function() {
