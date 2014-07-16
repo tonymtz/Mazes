@@ -54,6 +54,8 @@
           }
         }
       }
+
+      Sockets.refresh();
     };
 
     self.onUpdateOther = function(data) {
