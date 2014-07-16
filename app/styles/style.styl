@@ -24,6 +24,7 @@ h1, h2, h3, h4, h5
   padding 0 $paddingBase
 
 header
+  centered()
   wideTopBar()
   background $headerBackground
   color $headerColor
@@ -43,24 +44,50 @@ header
       font-weight bold
 
 footer
+  centered()
   wideBottomBar()
   background $footerBackground
+  background-image url('/assets/logo-github.png')
+  background-position center
+  background-repeat no-repeat
   color $footerColor
   height $footerHeight
   line-height $footerHeight
   padding 0 $paddingBase
 
+  .block
+    clear none
+    display inline-block
+    height 52px
+    line-height 52px
+    padding-right 2em
+    text-align right
+    width 50%
+
+  a.block
+    padding 0
+    padding-left 2em
+    text-align left
+
 .fullSize
   wide()
-  padding $headerHeight 0
+
+  &.spaced
+    padding-bottom $footerHeight
+    padding-top $headerHeight
 
 .button
   button()
 
 .toolButtons
+  centered()
   toolbar()
   height $footerHeight
   line-height $footerHeight
+
+  a
+    color $anchorColor
+    text-decoration none
 
   .button
     float right
