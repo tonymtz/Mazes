@@ -49,3 +49,4 @@ $ export NODE_ENV=staging
 * Make your changes
 * Pull Fork request
 
+Any pull request that don't merge cleanly will be rejected.
