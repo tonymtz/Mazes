@@ -47,13 +47,11 @@
       delete: function(id) {
         delete roomsList[id];
       },
-      addPlayer2Room: function(id, playerId) {
-        console.log(id);
-        console.log('CHANGOS!');
-        roomsList[id].players.push(playerId);
+      addPlayer2Room: function(roomId, playerId) {
+        roomsList[roomId].players.push(playerId);
       },
-      deletePlayerFromRoom: function(id, playerId) {
-        var players = roomsList[id].players,
+      deletePlayerFromRoom: function(roomId, playerId) {
+        var players = roomsList[roomId].players,
           index = players.indexOf(playerId);
         if (index >= 0) {
           players.splice(index, 1);

@@ -30,6 +30,7 @@
        };
 
     self.onUpdateMap = function(data) {
+      console.log('rerender');
       self.maze = data;
 
       for (var index = self.map.children.length - 1; index >= 0; index--) {
@@ -56,10 +57,11 @@
         }
       }
 
-      Sockets.refresh();
+      // Sockets.refresh();
     };
 
     self.onUpdateOther = function(data) {
+      console.log('room players: ', data);
       self.other.data = data;
 
       self.other.data.forEach(function(obj) {
@@ -79,6 +81,34 @@
         char.position.y = obj.y * CONFIG.tile.height;
         char.position.x = obj.x * CONFIG.tile.width;
       });
+    };
+
+    self.onOtherPlayerEnter = function(data) {
+      var character = null;
+      if (self.other.render[data.id]) {
+        character = self.other.render[data.id];
+      } else {
+        character = self.other.render[data.id] = new PIXI.Sprite(self.otherTexture);
+        character.height = CONFIG.tile.height;
+        character.width = CONFIG.tile.width;
+        character.tag = CONFIG.tags.character;
+        self.map.addChild(character);
+      }
+      character.position.y = data.location.y * CONFIG.tile.height;
+      character.position.x = data.location.x * CONFIG.tile.width;
+    };
+
+    self.onOtherPlayerMove = function(data) {
+      if (!data) return;
+      var character = self.other.render[data.id];
+      character.position.y = data.location.y * CONFIG.tile.height;
+      character.position.x = data.location.x * CONFIG.tile.width;
+    };
+
+    self.onOtherPlayerLeave = function(data) {
+      var character = self.other.render[data];
+      self.map.removeChild(character);
+      delete self.other.render[data];
     };
 
     self.onUpdatePlayer = function(data) {
@@ -123,7 +153,7 @@
       self.hero.position.y = self.player.location.y;
       self.hero.tag = CONFIG.tags.player;
       self.map.addChild(self.hero);
-      self.map.visible = false;
+      self.map.visible = true;
 
       self.stage.addChild(self.map);
 
@@ -135,9 +165,16 @@
     };
 
     self.bind = function() {
-      Sockets.connector.on(CONFIG.events.onMapRender, self.onUpdateMap);
-      Sockets.connector.on(CONFIG.events.onPlayerUpdate, self.onUpdatePlayer);
-      Sockets.connector.on(CONFIG.events.onOtherUpdate, self.onUpdateOther);
+      Sockets.connector.on('map_rerender', self.onUpdateMap); // done
+      Sockets.connector.on('other_enter', self.onOtherPlayerEnter); // done
+      Sockets.connector.on('other_leave', self.onOtherPlayerLeave); // done
+      Sockets.connector.on('other_move', self.onOtherPlayerMove); //
+      Sockets.connector.on('room_players', self.onUpdateOther);
+      Sockets.connector.on('player_update', self.onUpdatePlayer);
+
+      // Sockets.connector.on(CONFIG.events.onMapRender, self.onUpdateMap);
+      // Sockets.connector.on(CONFIG.events.onPlayerUpdate, self.onUpdatePlayer);
+      // Sockets.connector.on(CONFIG.events.onOtherUpdate, self.onUpdateOther);
       Sockets.connect('TestPlayer');
     };
 
