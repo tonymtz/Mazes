@@ -46,7 +46,21 @@
     };
 
     self.onUpdatePlayer = function(data) {
-      self.playerData = data;
+      if (data.location) {
+        if (self.playerData.location.x < data.location.x) {
+          self.player.animations.play('walk_right');
+        } else if (self.playerData.location.x > data.location.x) {
+          self.player.animations.play('walk_left');
+        } else if (self.playerData.location.y < data.location.y) {
+          self.player.animations.play('walk_down');
+        } else if (self.playerData.location.y > data.location.y) {
+          self.player.animations.play('walk_up');
+        } else {
+          self.player.animations.play('stand');
+        }
+
+        self.playerData = data;
+      }
     };
 
     self.preload = function() {
@@ -83,36 +97,8 @@
       self.game.physics.arcade.collide(self.player, self.blocks);
 
       if(self.playerData) {
-        var x = Math.round(self.player.x),
-            y = Math.round(self.player.y),
-            newX = self.playerData.location.x * CONFIG.tile.width,
-            newY = self.playerData.location.x * CONFIG.tile.height;
-
-        if(x !== newX && y != newY) {
-          self.player.body.velocity.setTo(newX, newY);
-
-          // WTF??? we are having a lot of floating point numbers here... ???
-          console.log(x, newX);
-
-          if(x < newX) {
-            self.player.animations.play('walk_left');
-            console.log('Left');
-          } else if(x > newX) {
-            self.player.animations.play('walk_right');
-            console.log('Right');
-          } else if(y < newY) {
-            self.player.animations.play('walk_up');
-            console.log('Up');
-          } else if(y > newY) {
-            self.player.animations.play('walk_down');
-            console.log('Down');
-          } else {
-            self.player.animations.play('stand');
-          }
-
-          self.player.x = newX;
-          self.player.y = newY;
-        }
+          self.player.x = self.playerData.location.x * CONFIG.tile.width;
+          self.player.y = self.playerData.location.y * CONFIG.tile.height;
       }
     };
 
