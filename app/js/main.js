@@ -1,5 +1,4 @@
-/* globals requestAnimFrame */
-;(function(Phaser, CONFIG, Sockets, Controls, $, io, window) {
+;(function(Phaser, CONFIG, Sockets, Controls, $) {
   'use strict';
 
   var Amazeing = (function(){
@@ -154,4 +153,4 @@
   }());
 
   Amazeing.init();
-})(Phaser, CONFIG, Sockets, Controls, $, io, window);
+})(Phaser, CONFIG, Sockets, Controls, $);
