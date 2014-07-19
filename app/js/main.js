@@ -29,30 +29,24 @@
         };
 
     self.onUpdateMap = function(data) {
-      console.log('Drawing map...');
+      if(data) {
+        self.maze = data;
+        console.log('Updating map...');
 
-      self.maze = data;
-
-      if(self.maze) {
         if(self.blocks) {
-          console.log('was already loaded!');
-          return;
+          self.blocks.removeAll();
         }
-
-        // I don't know why this is not drawing the blocks...
-
-        self.blocks = self.game.add.group();
-        self.blocks.enableBody = true;
 
         for (var i = 0; i < self.maze.length; i += 1) {
           for (var j = 0; j < self.maze[i].length; j += 1) {
             if (self.maze[i][j].sprite === CONFIG.tags.wall) {
-              var c = self.blocks.create(i * CONFIG.tile.width, j * CONFIG.tile.height, 'block');
-              c.name = 'block' + i + j;
+              var c = self.blocks.create(i * CONFIG.tile.width, j * CONFIG.tile.height, 'wall');
               c.body.immovable = true;
             }
           }
         }
+
+        self.game.physics.arcade.collide(self.player, self.blocks);
       }
     };
 
@@ -88,6 +82,7 @@
       self.game.load.spritesheet('dude', 'assets/dude.png', 16, 16, 60);
       self.game.load.spritesheet('boom', 'assets/boom.png', 32, 32);
       self.game.load.spritesheet('coin', 'assets/coin.png', 32, 32);
+      self.game.load.spritesheet('wall', 'assets/wall.png', 16, 16);
     };
 
     self.setupFX = function(effect) {
@@ -113,6 +108,10 @@
       self.player.animations.add('walk_up', [24,25,24,26], 10, true);
       self.player.animations.add('walk_down', [13,14,13,15], 10, true);
 
+      self.blocks = self.game.add.group();
+      self.blocks.enableBody = true;
+      self.blocks.physicsBodyType = Phaser.Physics.ARCADE;
+
       self.items = self.game.add.sprite(10, 10, 'coin');
       self.items.animations.add('spin');
       self.items.animations.play('spin', 10, true);
@@ -125,7 +124,9 @@
     };
 
     self.update = function() {
+      // nothing to do here!
       self.game.physics.arcade.collide(self.player, self.blocks);
+      self.player.body.velocity.setTo(0, 0);
     };
 
     self.render = function() {
