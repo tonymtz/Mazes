@@ -114,5 +114,10 @@
     players.delete(player.id);
   };
 
+  Events.prototype.returnMap = function(socket) {
+    var player = this.player;
+    socket.emit(events.reRenderMap, rooms.get(player.room).maze);
+  };
+
   module.exports = Events;
 })(module || this);

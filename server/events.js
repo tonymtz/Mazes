@@ -15,6 +15,10 @@
         console.log('MOVE: %s', socket.id);
       });
 
+      socket.on('need_map', function() {
+        events.returnMap(socket);
+      });
+
       socket.on('disconnect', function() {
         events.player_drop();
         console.log('DISC: %s', socket.id);
