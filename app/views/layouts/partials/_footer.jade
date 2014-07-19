@@ -1,16 +1,20 @@
 footer
   .toolButtons
-    span Project in development, thanks!
-    span#goFullScreen.button
-      | ☩ Full Screen
-
+    .block Under Development
+    a.block(href="https://github.com/TonyMtz/a-maze-ing", target="_blank") Watch on GitHub
 
 // bower dependencies
 script(src="vendor/zepto/zepto.min.js")
-script(src="vendor/phaser/phaser.min.js")
+script(src="vendor/socket.io-client/socket.io.js")
+script(src="vendor/pixi.js/bin/pixi.js")
+script(src="vendor/KeyboardJS/keyboard.js")
 
 // game scripts
+script(src="js/config.js")
+script(src="js/sockets.js")
+script(src="js/controls.js")
 script(src="js/main.js")
 
 // livereload
-script(src="http://127.0.0.1:35729/livereload.js")
+unless process.env.NODE_ENV === 'staging'
+  script(src="http://127.0.0.1:35729/livereload.js")

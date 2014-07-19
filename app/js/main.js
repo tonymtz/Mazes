@@ -1,133 +1,190 @@
-;(function(Phaser, $, window) {
+/* globals requestAnimFrame */
+;(function(PIXI, CONFIG, Sockets, Controls, $, io, window) {
   'use strict';
 
-  var maze,
-    game,
-    blocks,
-    player,
-    cursors,
-    playerData = {
-      vel: 80
-    },
-    bounds = {
-      height: $(window).height(),
-      width: $(window).width()
-    };
+  var Amazeing = (function(){
+    var self = {
+          container: $('#container'),
+          map: null,
+          stage: null,
+          renderer: null,
+          hero: null,
+          blockTexture: null,
+          otherTexture: null,
+          heroTexture: null,
+          bounds: {
+            height: null,
+            width: null
+          },
+          maze: null,
+          player: {
+            location: {
+              x: CONFIG.start.x,
+              y: CONFIG.start.y
+            }
+          },
+          other: {
+            data: [],
+            render: {}
+          }
+       };
 
-  $.getJSON('/maze', function(data){
-    maze = data;
-  });
+    self.onUpdateMap = function(data) {
+      console.log('rerender');
+      self.maze = data;
 
-  function drawMap() {
-    for (var i = 0; i < 31; i += 1) {
-      for (var j = 0; j < 31; j += 1) {
-        if (maze[i][j] === 1) {
-          // game.add.sprite(i * 32, j * 32, 'block');
-          var c = blocks.create(i * 64, j * 64, 'block');
-          c.name = 'block' + i + j;
-          c.body.immovable = true;
+      for (var index = self.map.children.length - 1; index >= 0; index--) {
+        var sprite = self.map.children[index];
+        if(sprite.tag === CONFIG.tags.wall || sprite.tag === CONFIG.tags.char) {
+          self.map.removeChild(sprite);
         }
       }
-    }
-  }
 
-  function preload() {
-    game.load.spritesheet('block', 'assets/block2.png', 64, 64);
-    game.load.spritesheet('dude', 'assets/dude.png', 16, 16, 60);
-    game.load.spritesheet('grass', 'assets/grass2.jpg', 64, 64);
-  }
+      for (var i = 0; i < self.maze.length; i += 1) {
+        for (var j = 0; j < self.maze[i].length; j += 1) {
+          if (self.maze[i][j].sprite === CONFIG.tags.wall) {
+            var wall = new PIXI.Sprite(self.blockTexture);
 
-  function create() {
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-    game.world.setBounds(0, 0, 1984, 1984);
-    game.stage.backgroundColor = '#424242';
-    game.scale.fullScreenScaleMode = Phaser.ScaleManager.NO_SCALE;
+            wall.height = CONFIG.tile.height;
+            wall.width = CONFIG.tile.width;
+            wall.position.y = j * CONFIG.tile.height;
+            wall.position.x = i * CONFIG.tile.width;
+            wall.tag = CONFIG.tags.wall;
 
-    game.add.tileSprite(0, 0, 1984, 1984, 'grass');
+            self.map.addChild(wall);
+            self.renderer.render(self.stage);
+          }
+        }
+      }
 
-    blocks = game.add.group();
-    blocks.enableBody = true;
-    blocks.physicsBodyType = Phaser.Physics.ARCADE;
-    drawMap();
+      // Sockets.refresh();
+    };
 
-    //  The hero!
-    player = game.add.sprite(64, 64, 'dude');   //this adds our player to the scene  (xposition, yposition, cachekey)
-    game.physics.enable(player); // enable physics for the player (arcade)
-    // player.anchor.setTo(0.5,0.5); // set the anchor to the exact middle of the player (good for flipping the image on the same place)
-    game.camera.follow(player);   // camera allways center the player
-    // player.body.width=16;  // my player image is smaller than the sprite frame size so this is a simple correction of the physicsbody so it does not look weird
-    player.body.setSize(12, 16, 2, 0);
+    self.onUpdateOther = function(data) {
+      console.log('room players: ', data);
+      self.other.data = data;
 
-    // this adds an animation for later use (custom cachekey, frames used for the animation, frames played per second, loop )
-    player.animations.add('stand', [13], 1, false);
-    player.animations.add('walk_left', [48,49,48,50], 10, true);
-    player.animations.add('walk_right', [36,37,36,38], 10, true);
-    player.animations.add('walk_up', [24,25,24,26], 10, true);
-    player.animations.add('walk_down', [13,14,13,15], 10, true);
+      self.other.data.forEach(function(obj) {
+        var char = null;
 
-    //  And some controls to play the game with
-    cursors = game.input.keyboard.createCursorKeys();
+        if (self.other.render[obj.id]) {
+          char = self.other.render[obj.id];
+        } else {
+          char = self.other.render[obj.id] = new PIXI.Sprite(self.otherTexture);
+          char.height = CONFIG.tile.height;
+          char.width = CONFIG.tile.width;
+          char.tag = CONFIG.tags.char;
 
-    $('#goFullScreen').on('click', goFullScreen);
+          self.map.addChild(char);
+        }
 
-    $(window).on('resize', resizeGame);
-  }
+        char.position.y = obj.y * CONFIG.tile.height;
+        char.position.x = obj.x * CONFIG.tile.width;
+      });
+    };
 
-  function update() {
-    game.physics.arcade.collide(player, blocks);
-    //  Reset the player, then check for movement keys
-    player.body.velocity.setTo(0, 0);
+    self.onOtherPlayerEnter = function(data) {
+      var character = null;
+      if (self.other.render[data.id]) {
+        character = self.other.render[data.id];
+      } else {
+        character = self.other.render[data.id] = new PIXI.Sprite(self.otherTexture);
+        character.height = CONFIG.tile.height;
+        character.width = CONFIG.tile.width;
+        character.tag = CONFIG.tags.character;
+        self.map.addChild(character);
+      }
+      character.position.y = data.location.y * CONFIG.tile.height;
+      character.position.x = data.location.x * CONFIG.tile.width;
+    };
 
-    if (cursors.left.isDown)
-    {
-      player.body.velocity.x = -playerData.vel;
-      player.animations.play('walk_left');
-    }
-    else if (cursors.right.isDown)
-    {
-      player.body.velocity.x = playerData.vel;
-      player.animations.play('walk_right');
-    }
-    else if (cursors.up.isDown)
-    {
-      player.body.velocity.y = -playerData.vel;
-      player.animations.play('walk_up');
-    }
-    else if (cursors.down.isDown)
-    {
-      player.body.velocity.y = playerData.vel;
-      player.animations.play('walk_down');
-    }
-    else {
-      player.animations.play('stand');
-    }
+    self.onOtherPlayerMove = function(data) {
+      if (!data) return;
+      var character = self.other.render[data.id];
+      character.position.y = data.location.y * CONFIG.tile.height;
+      character.position.x = data.location.x * CONFIG.tile.width;
+    };
 
-    // var collisionHandler = function() {
-    //   console.log('asdsd');
-    //   player.body.velocity.setTo(0, 0);
-    // };
-    // game.physics.arcade.overlap(player, blocks, collisionHandler, null, this);
-  }
+    self.onOtherPlayerLeave = function(data) {
+      var character = self.other.render[data];
+      self.map.removeChild(character);
+      delete self.other.render[data];
+    };
 
-  function render () {
-    // game.debug.body(player);
-    // game.debug.bodyInfo(player, 16, 24);
+    self.onUpdatePlayer = function(data) {
+      self.player = data;
+      self.map.position.x = Math.round(self.bounds.width / 2)-self.player.location.x * CONFIG.tile.height;
+      self.map.position.y = Math.round(self.bounds.height / 2)-self.player.location.y * CONFIG.tile.width;
 
-    if (game.scale.isFullScreen) {
-      game.debug.text('Press ESC to exit fullscreen', 15, 15);
-    }
-  }
+      self.map.visible = true;
+    };
 
-  function goFullScreen() {
-    game.scale.startFullScreen();
-    resizeGame();
-  }
+    self.updatePlayerSprite = function() {
+      self.hero.position.y = self.player.location.y * CONFIG.tile.height;
+      self.hero.position.x = self.player.location.x * CONFIG.tile.width;
 
-  function resizeGame(){
-    game.renderer.resize(window.innerWidth, window.innerHeight);
-    $('#screen').find('canvas').width(window.innerWidth).height(window.innerHeight);
-  }
+      self.renderer.render(self.stage);
+      requestAnimFrame(self.updatePlayerSprite);
+    };
 
-  game = new Phaser.Game(bounds.width, bounds.height, Phaser.AUTO, 'screen', { preload: preload, create: create, update: update, render: render });
+    self.setup = function() {
+      self.stage = new PIXI.Stage(0);
+      self.map = new PIXI.DisplayObjectContainer();
 
-})(Phaser, $, window);
+      self.bounds.height = self.container.height();
+      self.bounds.width = self.container.width();
+
+      self.renderer = PIXI.autoDetectRenderer(self.bounds.width, self.bounds.height);
+
+      self.blockTexture = PIXI.Texture.fromImage(CONFIG.maps.block);
+      self.otherTexture = PIXI.Texture.fromImage(CONFIG.maps.enemy);
+      self.otherTexture.setFrame(new PIXI.Rectangle(0, 0, CONFIG.sprites.width, CONFIG.sprites.height));
+      self.otherTexture.noFrame = false;
+
+      self.heroTexture = PIXI.Texture.fromImage(CONFIG.maps.hero);
+      self.heroTexture.setFrame(new PIXI.Rectangle(0, 0, CONFIG.sprites.width, CONFIG.sprites.height));
+      self.heroTexture.noFrame = false;
+
+      self.hero = new PIXI.Sprite(self.heroTexture);
+
+      self.hero.height = CONFIG.tile.height;
+      self.hero.width = CONFIG.tile.width;
+      self.hero.position.x = self.player.location.x;
+      self.hero.position.y = self.player.location.y;
+      self.hero.tag = CONFIG.tags.player;
+      self.map.addChild(self.hero);
+      self.map.visible = true;
+
+      self.stage.addChild(self.map);
+
+      self.renderer.render(self.stage);
+
+      requestAnimFrame(self.updatePlayerSprite);
+
+      self.container.append(self.renderer.view);
+    };
+
+    self.bind = function() {
+      Sockets.connector.on('map_rerender', self.onUpdateMap); // done
+      Sockets.connector.on('other_enter', self.onOtherPlayerEnter); // done
+      Sockets.connector.on('other_leave', self.onOtherPlayerLeave); // done
+      Sockets.connector.on('other_move', self.onOtherPlayerMove); //
+      Sockets.connector.on('room_players', self.onUpdateOther);
+      Sockets.connector.on('player_update', self.onUpdatePlayer);
+
+      // Sockets.connector.on(CONFIG.events.onMapRender, self.onUpdateMap);
+      // Sockets.connector.on(CONFIG.events.onPlayerUpdate, self.onUpdatePlayer);
+      // Sockets.connector.on(CONFIG.events.onOtherUpdate, self.onUpdateOther);
+      Sockets.connect('TestPlayer');
+    };
+
+    self.init = function() {
+      self.setup();
+      self.bind();
+    };
+
+    return self;
+  }());
+
+  Amazeing.init();
+})(PIXI, CONFIG, Sockets, Controls, $, io, window);

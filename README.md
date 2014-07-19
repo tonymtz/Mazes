@@ -13,9 +13,8 @@ Some of the future features:
 
 This project is in development, thanks!
 
-
-### How to run locally? ###
-
+### Instalation ###
+* Clone repo
 * Install [NodeJS](http://nodejs.org/download/)
 * Install Node dependencies
 ```bash
@@ -26,8 +25,28 @@ $ npm install
 $ bower install
 ```
 
-### Rules to add code
+### How to run locally? ###
+To build the project
+```bash
+$ gulp build
+```
+
+To run on development mode
+```bash
+$ gulp dev
+```
+
+By default gulp will __build__ the project.
+
+To deploy, set the following environment var on __staging__
+```bash
+$ export NODE_ENV=staging
+```
+
+### Rules to add code ###
 
 * Fork this project
 * Make your changes
 * Pull Fork request
+
+Any pull request that don't merge cleanly will be rejected.
