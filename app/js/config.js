@@ -41,6 +41,9 @@
       onPlayerMove: 'player_move',
       onPlayerUpdate: 'player_update',
       onPlayerDrop: 'player_drop',
+      onOtherPlayerEnter: 'other_enter',
+      onOtherPlayerLeave: 'other_leave',
+      onOtherPlayerMove: 'other_move',
       onRoomPlayersList: 'room_players'
     },
     intervals: {

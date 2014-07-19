@@ -45,7 +45,7 @@
       }
     };
 
-    self.onUpdatePlayer = function(data) {
+    self.onPlayerUpdate = function(data) {
       if (data.location) {
         if (self.playerData.location.x < data.location.x) {
           self.player.animations.play('walk_right');
@@ -106,10 +106,30 @@
       // Nothing to do here!
     };
 
+    self.onOtherPlayerEnter = function(data) {
+      console.log('onOtherPlayerEnter', data);
+    };
+
+    self.onOtherPlayerLeave = function(data) {
+      console.log('onOtherPlayerLeave', data);
+    };
+
+    self.onOtherPlayerMove = function(data) {
+      console.log('onOtherPlayerMove', data);
+    };
+
+    self.onRoomPlayersList = function(data) {
+      console.log('onRoomPlayersList', data);
+    };
+
     self.bind = function() {
       Sockets.connect('TestPlayer');
       Sockets.connector.on(CONFIG.events.onMapRender, self.onUpdateMap);
-      Sockets.connector.on(CONFIG.events.onPlayerUpdate, self.onUpdatePlayer);
+      Sockets.connector.on(CONFIG.events.onPlayerUpdate, self.onPlayerUpdate);
+      Sockets.connector.on(CONFIG.events.onOtherPlayerEnter, self.onOtherPlayerEnter); // done
+      Sockets.connector.on(CONFIG.events.onOtherPlayerLeave, self.onOtherPlayerLeave); // done
+      Sockets.connector.on(CONFIG.events.onOtherPlayerMove, self.onOtherPlayerMove); //
+      Sockets.connector.on(CONFIG.events.onRoomPlayersList, self.onRoomPlayersList);
     };
 
     self.init = function() {
