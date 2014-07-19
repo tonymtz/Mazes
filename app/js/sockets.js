@@ -8,7 +8,6 @@
 
     self.connect = function(playerName) {
       self.connector.emit('connection', playerName);
-      self.refresh();
     };
 
     self.refresh = function(){

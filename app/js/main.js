@@ -28,6 +28,8 @@
         };
 
     self.onUpdateMap = function(data) {
+      console.log('Drawing map...');
+
       self.maze = data;
 
       if(self.maze) {
@@ -49,7 +51,7 @@
 
     self.preload = function() {
       self.game.load.spritesheet('block', 'assets/block.png', 64, 64);
-      self.game.load.spritesheet('grass', 'assets/grass.jpg', 64, 64);
+      self.game.load.spritesheet('grass', 'assets/grass.png', 64, 64);
       self.game.load.spritesheet('dude', 'assets/dude.png', 16, 16, 60);
     };
 
@@ -62,7 +64,6 @@
 
       self.blocks = self.game.add.group();
       self.blocks.enableBody = true;
-      self.blocks.physicsBodyType = Phaser.Physics.ARCADE;
 
       self.player = self.game.add.sprite(64, 64, 'dude');
       self.game.physics.enable(self.player);
@@ -82,19 +83,36 @@
       self.game.physics.arcade.collide(self.player, self.blocks);
 
       if(self.playerData) {
-        if(self.player.x < self.playerData.location.x) {
-          self.player.animations.play('walk_left');
-        } else if(self.player.x > self.playerData.location.x) {
-          self.player.animations.play('walk_right');
-        } else if(self.player.y < self.playerData.location.y) {
-          self.player.animations.play('walk_up');
-        } else if(self.player.y > self.playerData.location.y) {
-          self.player.animations.play('walk_down');
+        var x = Math.round(self.player.x),
+            y = Math.round(self.player.y),
+            newX = self.playerData.location.x * CONFIG.tile.width,
+            newY = self.playerData.location.x * CONFIG.tile.height;
+
+        if(x !== newX && y != newY) {
+          self.player.body.velocity.setTo(newX, newY);
+
+          // WTF??? we are having a lot of floating point numbers here... ???
+          console.log(x, newX);
+
+          if(x < newX) {
+            self.player.animations.play('walk_left');
+            console.log('Left');
+          } else if(x > newX) {
+            self.player.animations.play('walk_right');
+            console.log('Right');
+          } else if(y < newY) {
+            self.player.animations.play('walk_up');
+            console.log('Up');
+          } else if(y > newY) {
+            self.player.animations.play('walk_down');
+            console.log('Down');
+          } else {
+            self.player.animations.play('stand');
+          }
+
+          self.player.x = newX;
+          self.player.y = newY;
         }
-
-        self.player.x = self.playerData.location.x * CONFIG.tile.width;
-        self.player.y = self.playerData.location.y * CONFIG. tile.height;
-
       }
     };
 
@@ -103,15 +121,9 @@
     };
 
     self.bind = function() {
+      Sockets.connect('TestPlayer');
       Sockets.connector.on(CONFIG.events.onMapRender, self.onUpdateMap);
       Sockets.connector.on(CONFIG.events.onPlayerUpdate, self.onUpdatePlayer);
-      // Sockets.connector.on(CONFIG.events.onOtherUpdate, self.onUpdateOther);
-//      Sockets.connector.on('other_enter', self.onOtherPlayerEnter); // done
-//      Sockets.connector.on('other_leave', self.onOtherPlayerLeave); // done
-//      Sockets.connector.on('other_move', self.onOtherPlayerMove); //
-//      Sockets.connector.on('room_players', self.onRoomPlayersList);
-
-      Sockets.connect('TestPlayer');
     };
 
     self.init = function() {
