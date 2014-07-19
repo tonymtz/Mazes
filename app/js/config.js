@@ -41,7 +41,7 @@
       onPlayerMove: 'player_move',
       onPlayerUpdate: 'player_update',
       onPlayerDrop: 'player_drop',
-      onOtherUpdate: 'other_update'
+      onRoomPlayersList: 'room_players'
     },
     intervals: {
       keyInterval: 150
