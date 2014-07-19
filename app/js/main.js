@@ -29,20 +29,12 @@
         };
 
     self.onUpdateMap = function(data) {
-      console.log('Drawing map...');
 
       self.maze = data;
 
       if(self.maze) {
-        if(self.blocks) {
-          console.log('was already loaded!');
-          return;
-        }
-
+        console.log('Drawing map...');
         // I don't know why this is not drawing the blocks...
-
-        self.blocks = self.game.add.group();
-        self.blocks.enableBody = true;
 
         for (var i = 0; i < self.maze.length; i += 1) {
           for (var j = 0; j < self.maze[i].length; j += 1) {
@@ -112,6 +104,9 @@
       self.player.animations.add('walk_right', [36,37,36,38], 10, true);
       self.player.animations.add('walk_up', [24,25,24,26], 10, true);
       self.player.animations.add('walk_down', [13,14,13,15], 10, true);
+
+      self.blocks = self.game.add.group();
+      self.blocks.enableBody = true;
 
       self.items = self.game.add.sprite(10, 10, 'coin');
       self.items.animations.add('spin');
