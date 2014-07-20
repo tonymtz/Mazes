@@ -24,7 +24,9 @@
               x: CONFIG.start.x,
               y: CONFIG.start.y
             },
-            speed: 80
+            speed: 80,
+            facing: 'down',
+            inTween: false
           }
         };
 
@@ -52,27 +54,62 @@
 
     self.onPlayerUpdate = function(data) {
       if (data.location) {
-        self.game.add.tween(self.player).to(
+        var thisTween = self.game.add.tween(self.player).to(
           {
             y: data.location.y * CONFIG.tile.height,
             x: data.location.x * CONFIG.tile.width
           },
           200, Phaser.Easing.linear, true, 0, false, false
         );
+        thisTween.onStart.add(function(){
+          self.playerData.inTween = true;
+        });
+        thisTween.onComplete.add(function(){
+          self.playerData.inTween = false;
+          if(!window.Controls.isMoving){
+            self.player.animations.stop();
+          }
+        });
 
         if (self.playerData.location.x < data.location.x) {
           self.player.animations.play('walk_right');
+          self.playerData.facing = 'right';
         } else if (self.playerData.location.x > data.location.x) {
           self.player.animations.play('walk_left');
+          self.playerData.facing = 'left';
         } else if (self.playerData.location.y < data.location.y) {
           self.player.animations.play('walk_down');
+          self.playerData.facing = 'down';
         } else if (self.playerData.location.y > data.location.y) {
           self.player.animations.play('walk_up');
+          self.playerData.facing = 'up';
         } else {
           self.player.animations.play('stand');
         }
 
-        self.playerData = data;
+        self.playerData.location = data.location;
+        self.playerData.id = data.id;
+      }
+    };
+
+    self.onPlayerPushing = function(pushing, key) {
+      pushing = pushing || false;
+      key = key || 'down';
+      if(pushing) {
+        switch(key){
+          case 37: self.playerData.facing = 'left'; break;
+          case 38: self.playerData.facing = 'up'; break;
+          case 39: self.playerData.facing = 'right'; break;
+          case 40: self.playerData.facing = 'down'; break;
+        }
+        switch(self.playerData.facing){
+          case 'right': self.player.animations.play('walk_right'); break;
+          case 'left': self.player.animations.play('walk_left'); break;
+          case 'down': self.player.animations.play('walk_down'); break;
+          case 'up': self.player.animations.play('walk_up'); break;
+        }
+      } else {
+          self.player.animations.stop();
       }
     };
 
@@ -182,4 +219,5 @@
   }());
 
   Amazeing.init();
+  window.Amazeing = Amazeing;
 })(Phaser, CONFIG, Sockets, Controls, $);
