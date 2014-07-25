@@ -17,12 +17,12 @@ var
     main    : 'server.js',
     server  : 'server/**/*',
     client  : {
-      assets   : 'app/assets/**/*',
-      mainView : 'app/styles/style.styl',
-      scripts  : 'app/js/**/*.js',
-      styles   : 'app/styles/**/*.styl',
-      vendors  : 'app/vendor/**/*',
-      views    : 'app/views/**/*.jade'
+      assets    : 'app/assets/**/*',
+      mainStyle : 'app/styles/style.styl',
+      scripts   : 'app/js/**/*.js',
+      styles    : 'app/styles/**/*.styl',
+      vendors   : 'app/vendor/**/*',
+      views     : 'app/views/**/*.jade'
     },
     build   : {
       base     : 'build',
@@ -66,7 +66,7 @@ gulp.task('lint', function() {
 });
 
 gulp.task('stylus', function() {
-  return gulp.src(paths.client.mainView)
+  return gulp.src(paths.client.mainStyle)
     .pipe(stylus({ pretty: true }))
     .pipe(gulp.dest(paths.build.styles));
 });
