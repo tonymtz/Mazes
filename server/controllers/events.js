@@ -27,6 +27,7 @@
       var currentPlayer = players.get(playerId),
         playerData = {
           id: currentPlayer.id,
+          direction: player.direction,
           location: {
             x: currentPlayer.location.x,
             y: currentPlayer.location.y
@@ -57,6 +58,7 @@
     this._sendToRoom(events.otherPlayerEnter, {
       id: player.id,
       name: player.name,
+      direction: player.direction,
       location: {
         x: player.location.x,
         y: player.location.y
@@ -73,6 +75,7 @@
     if (nextToDo === 1) { // Walking
       update = {
         id: player.id,
+        direction: player.direction,
         location: {
           x: player.location.x,
           y: player.location.y
@@ -95,6 +98,7 @@
       this._sendToRoom(events.otherPlayerEnter, {
         id: player.id,
         name: player.name,
+        direction: player.direction,
         location: {
           x: player.location.x,
           y: player.location.y
@@ -123,6 +127,7 @@
     var player = this.player,
       update = {
         id: player.id,
+        direction: player.direction,
         location: {
           x: player.location.x,
           y: player.location.y

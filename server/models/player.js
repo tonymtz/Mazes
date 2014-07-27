@@ -8,6 +8,7 @@
       this.id = id;
       this.name = name;
       this.room = 0;
+      this.direction = 8;
       this.location = {
         x: 3,
         y: 3
@@ -31,10 +32,19 @@
 
     var newPosition = { x: 0, y: 0 };
 
-    if (dir == 'up') newPosition = { x: x, y: y - 1 };
-    else if (dir == 'right') newPosition = { x: x + 1, y: y };
-    else if (dir == 'down') newPosition = { x: x, y: y + 1 };
-    else if (dir == 'left') newPosition = { x: x - 1, y: y };
+    if (dir == 'up') {
+      newPosition = { x: x, y: y - 1 };
+      this.direction = 2;
+    } else if (dir == 'right') {
+      this.direction = 6;
+      newPosition = { x: x + 1, y: y };
+    } else if (dir == 'down') {
+      this.direction = 8;
+      newPosition = { x: x, y: y + 1 };
+    } else if (dir == 'left') {
+      this.direction = 4;
+      newPosition = { x: x - 1, y: y };
+    }
 
     var nextToDo = maze[newPosition.x] === undefined ? 2 : this._checkCollision(maze[newPosition.x][newPosition.y]);
 
