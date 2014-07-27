@@ -1,5 +1,17 @@
+/*
+ * Phaser's hearts meaning:
+ *
+ * ♥: Basic functionality
+ * ♥♥: Either WebGl or WebAudio enabled
+ * ♥♥♥: WebGl and WebAudio enabled
+ */
 ;(function(Phaser, CONFIG, Sockets, Controls, $) {
   'use strict';
+
+  function nextInt(max, min) {
+    min = min || 0;
+    return Math.floor(Math.random() * (max - min) + min);
+  }
 
   var Amazeing = (function(){
     var self = {
@@ -47,12 +59,38 @@
         var pointer = 0;
         for (var i = 0; i < self.maze.width; i += 1) {
           for (var j = 0; j < self.maze.height; j += 1) {
-            if (map.charAt(pointer++) === '2') {
-              var c = self.blocks.create(i * CONFIG.tile.width, j * CONFIG.tile.height, 'world', CONFIG.world[tileset].wall);
-              c.body.immovable = true;
+            var block = map.charAt(pointer++),
+              tile = CONFIG.world[tileset],
+              decorate = tile.enableDecoration;
+
+            var addSprite = function (frame) {
+              self.blocks.create(i * CONFIG.tile.width, j * CONFIG.tile.height, 'world', frame);
+            };
+
+            if (block === '1') {
+              if (decorate && tile.wallBackground) addSprite(tile.wallBackground);
+              addSprite(tile.wall);
+              if (decorate && !nextInt(20) % 20) {
+                addSprite(tile.wallDecoration[nextInt(tile.wallDecoration.length)]);
+              }
+            } else if (block === '2') {
+              addSprite(tile.corridor);
+              if (decorate && !nextInt(20) % 20) {
+                addSprite(tile.corridorDecoration[nextInt(tile.corridorDecoration.length)]);
+              }
+            } else if (block === '3') {
+              addSprite(tile.room);
+              if (decorate && !nextInt(20) % 20) {
+                addSprite(tile.roomDecoration[nextInt(tile.roomDecoration.length)]);
+              }
+            } else if (block === '9') {
+              addSprite(tile.corridor);
+              addSprite(tile.door);
             }
           }
         }
+
+        self.game.world.bringToTop(self.player);
 
         self.background.loadTexture('world', CONFIG.world[tileset].background);
         self.game.physics.arcade.collide(self.player, self.blocks);
@@ -165,13 +203,7 @@
       self.game.physics.enable(self.player);
       self.game.camera.follow(self.player);
       self.player.body.setSize(12, 16, 2, 0);
-
-// Maybe need to change this
-      // self.player.animations.add('stand', CONFIG.player[self.playerData.type].stand, 1, false);
-      // self.player.animations.add('walk_left', CONFIG.player[self.playerData.type].walkLeft, 10, true);
-      // self.player.animations.add('walk_right', CONFIG.player[self.playerData.type].walkRight, 10, true);
-      // self.player.animations.add('walk_up', CONFIG.player[self.playerData.type].walkUp, 10, true);
-      // self.player.animations.add('walk_down', CONFIG.player[self.playerData.type].walkDown, 10, true);
+      self.player.bringToTop();
 
       self.blocks = self.game.add.group();
       self.blocks.enableBody = true;

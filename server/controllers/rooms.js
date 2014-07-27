@@ -15,7 +15,7 @@
 
   module.exports = (function() {
     var id = new Date().getTime();
-    startRoom = new Room(id);
+    startRoom = new Room(id, 'forest', null, null, null, 'Hera\'s Forest');
     roomsList[id] = startRoom;
 
     return {

@@ -109,27 +109,62 @@
     },
     world: {
       cave: {
-        background: 75,
-        wall: 79
+        enableDecoration: true,
+        background: 144,
+        corridor: 75,
+        corridorDecoration: [1826, 1733],
+        door: 966,
+        room: 75,
+        roomDecoration: [1824, 1825, 1826],
+        wall: 1031,
+        wallBackground: 75,
+        wallDecoration: [1857, 1733]
       },
       desert: {
-        background: 384,
-        wall: 1063
+        enableDecoration: false,
+        background: 75,
+        door: 966,
+        wall: 999
       },
       dungeon: {
-        background: 202,
-        wall: 26
+        enableDecoration: true,
+        background: 191,
+        corridor: 202,
+        corridorDecoration: [234],
+        door: 966,
+        room: 140,
+        roomDecoration: [172],
+        wall: 26,
+        wallDecoration: [7]
       },
       forest: {
-        background: 72,
-        wall: 1062
+        enableDecoration: true,
+        background: 409,
+        corridor: 70,
+        corridorDecoration: [1024, 1026, 1056, 1057, 1058],
+        door: 966,
+        room: 70,
+        roomDecoration: [1024, 1026, 1056, 1057, 1058],
+        wall: 1062,
+        wallBackground: 70,
+        wallDecoration: []
       },
       mountain: {
+        enableDecoration: true,
         background: 339,
-        wall: 1063
+        corridor: 337,
+        corridorDecoration: [],
+        door: 966,
+        room: 337,
+        roomDecoration: [996],
+        wall: 1063,
+        wallBackground: 337,
+        wallDecoration: []
       },
       snow: {
+        enableDecoration: false,
         background: 387,
+        door: 966,
         wall: 291
       }
     }

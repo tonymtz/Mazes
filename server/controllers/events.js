@@ -70,7 +70,6 @@
   };
 
   Events.prototype.player_move = function(dir) {
-    console.log('mode: ', dir);
     var player = players.get(this.socket.id),
       nextToDo = players.move(player.id, dir),
       update;

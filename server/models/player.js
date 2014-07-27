@@ -11,14 +11,14 @@
       this.direction = 8;
       this.type = ['phantom', 'skull', 'troll', 'gargoyle', 'elf', 'girl', 'death', 'boy'][Math.floor(Math.random() * 8)];
       this.location = {
-        x: 3,
-        y: 3
+        x: 1,
+        y: 1
       };
     };
 
   Player.prototype._checkCollision = function(other) {
     if (other === undefined) return 2;
-    if (other === 2) return 0;
+    if (other === 1) return 0;
     return 1;
   }
 
