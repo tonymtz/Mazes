@@ -28,6 +28,7 @@
         playerData = {
           id: currentPlayer.id,
           direction: player.direction,
+          type: player.type,
           location: {
             x: currentPlayer.location.x,
             y: currentPlayer.location.y
@@ -59,6 +60,7 @@
       id: player.id,
       name: player.name,
       direction: player.direction,
+      type: player.type,
       location: {
         x: player.location.x,
         y: player.location.y
@@ -76,6 +78,7 @@
       update = {
         id: player.id,
         direction: player.direction,
+        type: player.type,
         location: {
           x: player.location.x,
           y: player.location.y
@@ -99,6 +102,7 @@
         id: player.id,
         name: player.name,
         direction: player.direction,
+        type: player.type,
         location: {
           x: player.location.x,
           y: player.location.y
@@ -128,6 +132,7 @@
       update = {
         id: player.id,
         direction: player.direction,
+        type: player.type,
         location: {
           x: player.location.x,
           y: player.location.y

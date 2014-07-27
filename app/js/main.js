@@ -21,6 +21,7 @@
           },
           player: null,
           playerData: {
+            type: null,
             location: {
               x: CONFIG.start.x,
               y: CONFIG.start.y
@@ -48,7 +49,6 @@
           for (var j = 0; j < self.maze.height; j += 1) {
             if (map.charAt(pointer++) === '2') {
               var c = self.blocks.create(i * CONFIG.tile.width, j * CONFIG.tile.height, 'world', CONFIG.world[tileset].wall);
-              c.scale.setTo(0.5, 0.5); // Temporary
               c.body.immovable = true;
             }
           }
@@ -60,6 +60,7 @@
       }
     };
 
+    var once = true; // TODO - Ugly hack, see comment below
     self.onPlayerUpdate = function(data) {
       if (data.location) {
         var thisTween = self.game.add.tween(self.player).to(
@@ -97,6 +98,20 @@
 
         self.playerData.location = data.location;
         self.playerData.id = data.id;
+        self.playerData.type = data.type;
+
+        if (once) {
+          /*
+           * This need to be replaced by play animations instead of add animations forever.
+           * Or need to destroy sprite before adding new animations...
+           */
+          self.player.animations.add('stand', CONFIG.player[self.playerData.type].stand, 1, false);
+          self.player.animations.add('walk_left', CONFIG.player[self.playerData.type].walkLeft, 10, true);
+          self.player.animations.add('walk_right', CONFIG.player[self.playerData.type].walkRight, 10, true);
+          self.player.animations.add('walk_up', CONFIG.player[self.playerData.type].walkUp, 10, true);
+          self.player.animations.add('walk_down', CONFIG.player[self.playerData.type].walkDown, 10, true);
+          once = false;
+        }
       }
     };
 
@@ -131,6 +146,7 @@
 
       // Pixi engine has a bug, we cannot load a image with size different to x^2
       self.game.load.spritesheet('world', 'assets/tileset_world_32.png', 32, 32, 2048);
+      self.game.load.spritesheet('player', 'assets/tileset_player_32.png', 32, 32, 96);
     };
 
     self.setupFX = function(effect) {
@@ -145,16 +161,17 @@
 
       self.background = self.game.add.tileSprite(0, 0, 1984, 1984, 'world', CONFIG.world.forest.background);
 
-      self.player = self.game.add.sprite(48, 48, 'dude');
+      self.player = self.game.add.sprite(32, 32, 'player');
       self.game.physics.enable(self.player);
       self.game.camera.follow(self.player);
       self.player.body.setSize(12, 16, 2, 0);
 
-      self.player.animations.add('stand', [13], 1, false);
-      self.player.animations.add('walk_left', [48,49,48,50], 10, true);
-      self.player.animations.add('walk_right', [36,37,36,38], 10, true);
-      self.player.animations.add('walk_up', [24,25,24,26], 10, true);
-      self.player.animations.add('walk_down', [13,14,13,15], 10, true);
+// Maybe need to change this
+      // self.player.animations.add('stand', CONFIG.player[self.playerData.type].stand, 1, false);
+      // self.player.animations.add('walk_left', CONFIG.player[self.playerData.type].walkLeft, 10, true);
+      // self.player.animations.add('walk_right', CONFIG.player[self.playerData.type].walkRight, 10, true);
+      // self.player.animations.add('walk_up', CONFIG.player[self.playerData.type].walkUp, 10, true);
+      // self.player.animations.add('walk_down', CONFIG.player[self.playerData.type].walkDown, 10, true);
 
       self.blocks = self.game.add.group();
       self.blocks.enableBody = true;

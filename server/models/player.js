@@ -9,6 +9,7 @@
       this.name = name;
       this.room = 0;
       this.direction = 8;
+      this.type = ['phantom', 'skull', 'troll', 'gargoyle', 'elf', 'girl', 'death', 'boy'][Math.floor(Math.random() * 8)];
       this.location = {
         x: 3,
         y: 3
