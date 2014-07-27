@@ -3,6 +3,7 @@
 
   var Amazeing = (function(){
     var self = {
+          background: null,
           blocks: null,
           bounds: {
             height: null,
@@ -33,7 +34,8 @@
     self.onUpdateMap = function(data) {
       if(data) {
         self.maze = data;
-        var map = window.atob(self.maze.cells);
+        var map = window.atob(self.maze.cells),
+          tileset = self.maze.tileset;
 
         console.log('Updating map...');
 
@@ -45,12 +47,14 @@
         for (var i = 0; i < self.maze.width; i += 1) {
           for (var j = 0; j < self.maze.height; j += 1) {
             if (map.charAt(pointer++) === '2') {
-              var c = self.blocks.create(i * CONFIG.tile.width, j * CONFIG.tile.height, 'wall');
+              var c = self.blocks.create(i * CONFIG.tile.width, j * CONFIG.tile.height, 'world', CONFIG.world[tileset].wall);
+              c.scale.setTo(0.5, 0.5); // Temporary
               c.body.immovable = true;
             }
           }
         }
 
+        self.background.loadTexture('world', CONFIG.world[tileset].background);
         self.game.physics.arcade.collide(self.player, self.blocks);
       }
     };
@@ -123,6 +127,9 @@
       self.game.load.spritesheet('boom', 'assets/boom.png', 32, 32);
       self.game.load.spritesheet('coin', 'assets/coin.png', 32, 32);
       self.game.load.spritesheet('wall', 'assets/wall.png', 16, 16);
+
+      // Pixi engine has a bug, we cannot load a image with size different to x^2
+      self.game.load.spritesheet('world', 'assets/tileset_world_32.png', 32, 32, 2048);
     };
 
     self.setupFX = function(effect) {
@@ -135,7 +142,7 @@
       self.game.world.setBounds(0, 0, 1984, 1984);
       self.game.stage.backgroundColor = '#424242';
 
-      self.game.add.tileSprite(0, 0, 1984, 1984, 'grass');
+      self.background = self.game.add.tileSprite(0, 0, 1984, 1984, 'world', CONFIG.world.forest.background);
 
       self.player = self.game.add.sprite(48, 48, 'dude');
       self.game.physics.enable(self.player);
@@ -207,7 +214,7 @@
       self.game = new Phaser.Game(
         self.bounds.width,
         self.bounds.height,
-        Phaser.AUTO,
+        Phaser.CANVAS, // Another bug here, WebGL is running into issues when trying to load a texture for tileSprite
         'container',
         {
           preload: self.preload,
