@@ -4,13 +4,14 @@
 
   var _ = require('underscore'),
     Maze = require('./maze'),
-    Room = function(id, height, width, exits, name) {
+    Room = function(id, height, width, exits, name, multiplier) {
       this.id = id;
       this.name = 'map ' + id;
       this.height = height || 15;
       this.width = width || 15;
       this.exits = exits || 4;
-      this.maze = new Maze(this.height, this.width, 3, exits);
+      this.multiplier = multiplier || 3;
+      this.maze = new Maze(this.height, this.width, this.multiplier, this.exits);
       this.players = [];
       this.neighbors = {
         up: null,
@@ -21,8 +22,8 @@
       this.json = (function() {
         var json = {};
 
-        json.height = this.height;
-        json.width = this.width;
+        json.height = this.height * this.multiplier;
+        json.width = this.width * this.multiplier;
         json.name = this.name;
         json.tileset = ['forest', 'dungeon', 'mountain', 'cave', 'snow', 'desert'][Math.floor(Math.random() * 6)];
 

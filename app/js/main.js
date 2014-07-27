@@ -33,15 +33,18 @@
     self.onUpdateMap = function(data) {
       if(data) {
         self.maze = data;
+        var map = window.atob(self.maze.cells);
+
         console.log('Updating map...');
 
         if(self.blocks) {
           self.blocks.removeAll();
         }
 
-        for (var i = 0; i < self.maze.length; i += 1) {
-          for (var j = 0; j < self.maze[i].length; j += 1) {
-            if (self.maze[i][j].sprite === CONFIG.tags.wall) {
+        var pointer = 0;
+        for (var i = 0; i < self.maze.width; i += 1) {
+          for (var j = 0; j < self.maze.height; j += 1) {
+            if (map.charAt(pointer++) === '2') {
               var c = self.blocks.create(i * CONFIG.tile.width, j * CONFIG.tile.height, 'wall');
               c.body.immovable = true;
             }
