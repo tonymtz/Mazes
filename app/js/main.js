@@ -56,6 +56,7 @@
 
         self.background.loadTexture('world', CONFIG.world[tileset].background);
         self.game.physics.arcade.collide(self.player, self.blocks);
+        Sockets.connector.emit('need_player');
       }
     };
 

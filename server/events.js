@@ -19,6 +19,10 @@
         events.returnMap(socket);
       });
 
+      socket.on('need_player', function() {
+        events.returnPlayer(socket);
+      });
+
       socket.on('disconnect', function() {
         events.player_drop();
         console.log('DISC: %s', socket.id);

@@ -119,5 +119,17 @@
     socket.emit(events.reRenderMap, rooms.get(player.room).json);
   };
 
+  Events.prototype.returnPlayer = function(socket) {
+    var player = this.player,
+      update = {
+        id: player.id,
+        location: {
+          x: player.location.x,
+          y: player.location.y
+        }
+      };
+    socket.emit('player_update', update);
+  };
+
   module.exports = Events;
 })(module || this);

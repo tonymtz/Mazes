@@ -43,10 +43,10 @@
       this.location.y = newPosition.y;
       maze[newPosition.x][newPosition.y] = 9;
     } else if (nextToDo === 2) {
-      if (dir == 'up') this.location.y = maze[0].length;
+      if (dir == 'up') this.location.y = maze[0].length - 1;
       else if (dir == 'right') this.location.x = 0;
       else if (dir == 'down') this.location.y = 0;
-      else if (dir == 'left') this.location.x = maze.length;
+      else if (dir == 'left') this.location.x = maze.length - 1;
     }
 
     return nextToDo;
