@@ -53,7 +53,7 @@
       player = this.player;
     clients.push(client);
     players.enter2Room(player.id, rooms.getStarter().id);
-    client.emit(events.reRenderMap, rooms.get(player.room).maze);
+    client.emit(events.reRenderMap, rooms.get(player.room).json);
     this._sendToRoom(events.otherPlayerEnter, {
       id: player.id,
       name: player.name,
@@ -90,7 +90,7 @@
       rooms.deletePlayerFromRoom(player.room, player.id);
       rooms.addPlayer2Room(nextRoom, player.id);
       player.room = nextRoom;
-      this.socket.emit(events.reRenderMap, rooms.get(this.player.room).maze);
+      this.socket.emit(events.reRenderMap, rooms.get(this.player.room).json);
       this._getAllPlayersOnRoom();
       this._sendToRoom(events.otherPlayerEnter, {
         id: player.id,
@@ -116,7 +116,7 @@
 
   Events.prototype.returnMap = function(socket) {
     var player = this.player;
-    socket.emit(events.reRenderMap, rooms.get(player.room).maze);
+    socket.emit(events.reRenderMap, rooms.get(player.room).json);
   };
 
   module.exports = Events;

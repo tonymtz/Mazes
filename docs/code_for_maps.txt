@@ -1,0 +1,5 @@
+Codes for map
+
+0 empty
+1 floor
+2 wall

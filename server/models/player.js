@@ -16,7 +16,7 @@
 
   Player.prototype._checkCollision = function(other) {
     if (other === undefined) return 2;
-    if (other.type === 'wall') return 0;
+    if (other === 2) return 0;
     return 1;
   }
 
