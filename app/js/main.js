@@ -48,7 +48,10 @@
       if(data) {
         self.maze = data;
         var map = window.atob(self.maze.cells),
-          tileset = self.maze.tileset;
+          tileset = self.maze.tileset,
+          addSprite = function (frame) {
+            self.blocks.create(i * CONFIG.tile.width, j * CONFIG.tile.height, 'world', frame);
+          };
 
         console.log('Updating map...');
 
@@ -63,12 +66,10 @@
               tile = CONFIG.world[tileset],
               decorate = tile.enableDecoration;
 
-            var addSprite = function (frame) {
-              self.blocks.create(i * CONFIG.tile.width, j * CONFIG.tile.height, 'world', frame);
-            };
-
             if (block === '1') {
-              if (decorate && tile.wallBackground) addSprite(tile.wallBackground);
+              if (decorate && tile.wallBackground) {
+                addSprite(tile.wallBackground);
+              }
               addSprite(tile.wall);
               if (decorate && !nextInt(20) % 20) {
                 addSprite(tile.wallDecoration[nextInt(tile.wallDecoration.length)]);
