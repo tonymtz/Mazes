@@ -176,12 +176,7 @@
     };
 
     self.preload = function() {
-      self.game.load.spritesheet('block', 'assets/block.png', 64, 64);
-      self.game.load.spritesheet('grass', 'assets/grass.png', 64, 64);
-      self.game.load.spritesheet('dude', 'assets/dude.png', 16, 16, 60);
-      self.game.load.spritesheet('boom', 'assets/boom.png', 32, 32);
       self.game.load.spritesheet('coin', 'assets/coin.png', 32, 32);
-      self.game.load.spritesheet('wall', 'assets/wall.png', 16, 16);
 
       // Pixi engine has a bug, we cannot load a image with size different to x^2
       self.game.load.spritesheet('world', 'assets/tileset_world_32.png', 32, 32, 2048);
@@ -197,6 +192,7 @@
       self.game.physics.startSystem(Phaser.Physics.ARCADE);
       self.game.world.setBounds(0, 0, 1984, 1984);
       self.game.stage.backgroundColor = '#424242';
+      self.game.stage.disableVisibilityChange = true;
 
       self.background = self.game.add.tileSprite(0, 0, 1984, 1984, 'world', CONFIG.world.forest.background);
 
@@ -233,14 +229,36 @@
 
     self.onOtherPlayerEnter = function(data) {
       console.log('onOtherPlayerEnter', data);
+      if (!data) return;
+      if (!self.other.render[data.id]) {
+        self.other.render[data.id] = self.game.add.sprite(32, 32, 'player');
+      }
+      self.other.render[data.id].bringToTop();
     };
 
     self.onOtherPlayerLeave = function(data) {
       console.log('onOtherPlayerLeave', data);
+      if (!data) return;
+      if (self.other.render[data]) {
+        self.other.render[data].destroy();
+        delete self.other.render[data];
+      }
     };
 
     self.onOtherPlayerMove = function(data) {
       console.log('onOtherPlayerMove', data);
+      if (!data) return;
+      if (!self.other.render[data.id]) {
+        self.other.render[data.id] = self.game.add.sprite(32, 32, 'player');
+      }
+
+      self.game.add.tween(self.other.render[data.id]).to(
+        {
+          y: data.location.y * CONFIG.tile.height,
+          x: data.location.x * CONFIG.tile.width
+        },
+        200, Phaser.Easing.linear, true, 0, false, false
+      );
     };
 
     self.onRoomPlayersList = function(data) {

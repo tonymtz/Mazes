@@ -23,12 +23,12 @@
       playersInRoom = rooms.get(this.player.room).players,
       update = [];
     playersInRoom.forEach(function(playerId) {
-      if (playerId === self.player.id) return;
+      if (!playerId || playerId === self.player.id) return;
       var currentPlayer = players.get(playerId),
         playerData = {
           id: currentPlayer.id,
-          direction: player.direction,
-          type: player.type,
+          direction: currentPlayer.direction,
+          type: currentPlayer.type,
           location: {
             x: currentPlayer.location.x,
             y: currentPlayer.location.y
@@ -69,7 +69,7 @@
     this._getAllPlayersOnRoom();
   };
 
-  Events.prototype.player_move = function(dir) {
+  Events.prototype.player_move = function(dir) { // revisited for 0.0.4
     var player = players.get(this.socket.id),
       nextToDo = players.move(player.id, dir),
       update;
