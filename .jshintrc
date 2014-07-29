@@ -19,15 +19,14 @@
     "globals": {
         "console": false,
         "window": false,
-        "PIXI": false,
         "io": false,
         "$": false,
-        "KeyboardJS": false,
         "CONFIG": false,
         "Controls": false,
         "Sockets": false,
         "document": true,
         "setInterval": true,
-        "clearInterval": true
+        "clearInterval": true,
+        "Phaser": true
     }
 }

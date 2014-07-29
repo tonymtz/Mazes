@@ -12,7 +12,7 @@
     };
 
     self.refresh = function(){
-      self.connector.emit(CONFIG.events.onPlayerMove, CONFIG.keys.none);
+       self.connector.emit('need_map');
     };
 
     self.init = function() {

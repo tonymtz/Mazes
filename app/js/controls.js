@@ -5,7 +5,8 @@
     var self = {
       onPlayerMove: CONFIG.events.onPlayerMove,
       keys: null,
-      timers: {}
+      isMoving: false,
+      timers: []
     };
 
     self.moveLeft = function() {
@@ -37,6 +38,8 @@
 
         if (CONFIG.intervals.keyInterval  !== 0) {
           self.timers[key] = setInterval(self.keys[key], CONFIG.intervals.keyInterval);
+          self.isMoving = true;
+          window.Amazeing.onPlayerPushing(self.isMoving, key);
         }
       }
       return false;
@@ -52,6 +55,12 @@
 
         delete self.timers[key];
       }
+      self.isMoving = !$.isEmptyObject(self.timers);
+      
+      if(!self.isMoving) {
+        window.Amazeing.onPlayerPushing(false);
+      }
+
     };
 
     self.onBlur = function() {
@@ -78,7 +87,9 @@
     };
 
     return self;
-  }()).init();
+  }());
+
+  Controls.init();
 
   window.Controls = Controls;
 })(Sockets, window);
