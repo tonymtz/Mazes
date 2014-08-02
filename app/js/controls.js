@@ -56,11 +56,10 @@
         delete self.timers[key];
       }
       self.isMoving = !$.isEmptyObject(self.timers);
-      
+
       if(!self.isMoving) {
         window.Amazeing.onPlayerPushing(false);
       }
-
     };
 
     self.onBlur = function() {

@@ -229,7 +229,9 @@
 
     self.onOtherPlayerEnter = function(data) {
       console.log('onOtherPlayerEnter', data);
-      if (!data) return;
+      if (!data) {
+        return;
+      }
       if (!self.other.render[data.id]) {
         self.other.render[data.id] = self.game.add.sprite(32, 32, 'player');
       }
@@ -238,7 +240,9 @@
 
     self.onOtherPlayerLeave = function(data) {
       console.log('onOtherPlayerLeave', data);
-      if (!data) return;
+      if (!data) {
+        return;
+      }
       if (self.other.render[data]) {
         self.other.render[data].destroy();
         delete self.other.render[data];
@@ -247,7 +251,9 @@
 
     self.onOtherPlayerMove = function(data) {
       console.log('onOtherPlayerMove', data);
-      if (!data) return;
+      if (!data) {
+        return;
+      }
       if (!self.other.render[data.id]) {
         self.other.render[data.id] = self.game.add.sprite(32, 32, 'player');
       }
