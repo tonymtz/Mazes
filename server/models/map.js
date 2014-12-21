@@ -2,13 +2,18 @@
 (function(module) {
   'use strict';
 
-  var cell = {
-    blank: 1,
-    corridor: 2,
-    door: 9,
-    room: 3,
-    wall: 4
-  };
+  var
+    spriteMap,
+    walkableMap,
+    sprite = {
+      blank: 1,
+      corridor: 2,
+      door: 9,
+      room: 3,
+      wall: 4
+    },
+    walkable = 0,
+    notWalkable = 1;
 
   function nextInt(max, min) {
     min = min || 0;
@@ -33,9 +38,8 @@
   }
 
   function MazeGenerator(height, width, multiplicator, exits) {
-    var maze;
-
-    maze = createWorld(height, width);
+    walkableMap = createEmptyMap(walkable, height, width);
+    spriteMap = createEmptyMap(sprite.blank, height, width);
 
     var row = nextInt(height);
     while (row % 2 === 0) {
@@ -45,27 +49,30 @@
     while (column % 2 === 0) {
       column = nextInt(width);
     }
-    maze[row][column] = 1;
-    generateWorld(row, column, maze, height, width);
+    walkableMap[row][column] = notWalkable;
+    generateWorld(row, column, walkableMap, height, width);
 
-    maze = createOpenSpaces(maze, height, width);
-    maze = growIt(maze, multiplicator);
-    maze = addExit(maze, height, width, exits);
+    walkableMap = createOpenSpaces(walkableMap, height, width);
+    walkableMap = growIt(walkableMap, multiplicator);
+    walkableMap = addExit(walkableMap, height, width, exits);
 
-    return maze;
+    return {
+      walkableMap: walkableMap,
+      spriteMap: spriteMap
+    };
   };
 
-  function createWorld(height, width) {
-    var maze = [];
+  function createEmptyMap(fillWith, height, width) {
+    var map = [];
 
     for (var i = 0; i < height; i += 1) {
-      maze[i] = [];
+      map[i] = [];
       for (var j = 0; j < width; j += 1) {
-        maze[i][j] = cell.blank;
+        map[i][j] = fillWith;
       }
     }
 
-    return maze;
+    return map;
   }
 
   function createOpenSpaces(maze, height, width) {
@@ -81,7 +88,7 @@
         if (!map[random_row + i + 1] || map[random_row + i + 2] === 3) break;
         for (var j = 0; j < room_width; j += 1) {
           if (!map[random_row + i][random_column + j + 1] || map[random_row + i][random_column + j + 2] === 3) break;
-          map[random_row + i][random_column + j] = cell.room;
+          map[random_row + i][random_column + j] = sprite.room;
         }
       }
     }
@@ -93,7 +100,8 @@
     return map;
   }
 
-  function generateWorld(row, col, maze, height, width) {
+  function generateWorld(row, column, maze, height, width) {
+
     var randDirs = randomDirections();
     for (var i = 0; i < randDirs.length; i += 1) {
       switch (randDirs[i]) {
@@ -101,40 +109,40 @@
           if (row - 2 < 0) {
             continue;
           }
-          if (maze[row - 2][col] !== cell.corridor) {
-            maze[row - 2][col] = cell.corridor;
-            maze[row - 1][col] = cell.corridor;
-            generateWorld(row - 2, col, maze, height, width);
+          if (maze[row - 2][column] !== notWalkable) {
+            maze[row - 2][column] = notWalkable;
+            maze[row - 1][column] = notWalkable;
+            generateWorld(row - 2, column, maze, height, width);
           }
           break;
         case 2: // right
-          if (col + 2 > width - 1) {
+          if (column + 2 > width - 1) {
             continue;
           }
-          if (maze[row][col + 2] !== cell.corridor) {
-            maze[row][col + 2] = cell.corridor;
-            maze[row][col + 1] = cell.corridor;
-            generateWorld(row, col + 2, maze, height, width);
+          if (maze[row][column + 2] !== notWalkable) {
+            maze[row][column + 2] = notWalkable;
+            maze[row][column + 1] = notWalkable;
+            generateWorld(row, column + 2, maze, height, width);
           }
           break;
         case 3: // down
           if (row + 2 > height - 1) {
             continue;
           }
-          if (maze[row + 2][col] !== cell.corridor) {
-            maze[row + 2][col] = cell.corridor;
-            maze[row + 1][col] = cell.corridor;
-            generateWorld(row + 2, col, maze, height, width);
+          if (maze[row + 2][column] !== notWalkable) {
+            maze[row + 2][column] = notWalkable;
+            maze[row + 1][column] = notWalkable;
+            generateWorld(row + 2, column, maze, height, width);
           }
           break;
         case 4: // left
-          if (col - 2 <= 0) {
+          if (column - 2 <= 0) {
             continue;
           }
-          if (maze[row][col - 2] !== cell.corridor) {
-            maze[row][col - 2] = cell.corridor;
-            maze[row][col - 1] = cell.corridor;
-            generateWorld(row, col - 2, maze, height, width);
+          if (maze[row][column - 2] !== notWalkable) {
+            maze[row][column - 2] = notWalkable;
+            maze[row][column - 1] = notWalkable;
+            generateWorld(row, column - 2, maze, height, width);
           }
           break;
       }
@@ -179,16 +187,16 @@
       var yHalf = Math.floor(height / 2);
       switch (randDirs.pop()) {
         case 1:
-          if (maze[xHalf][1] === cell.corridor) maze[xHalf][0] = cell.door;
+          if (maze[xHalf][1] === sprite.corridor) maze[xHalf][0] = sprite.door;
           break;
         case 2:
-          if (maze[xHalf][height - 2] === cell.corridor) maze[xHalf][height - 1] = cell.door;
+          if (maze[xHalf][height - 2] === sprite.corridor) maze[xHalf][height - 1] = sprite.door;
           break;
         case 3:
-          if (maze[1][yHalf] === cell.corridor) maze[0][yHalf] = cell.door;
+          if (maze[1][yHalf] === sprite.corridor) maze[0][yHalf] = sprite.door;
           break;
         case 4:
-          if (maze[width - 2][yHalf] === cell.corridor) maze[width - 1][yHalf] = cell.door;
+          if (maze[width - 2][yHalf] === sprite.corridor) maze[width - 1][yHalf] = sprite.door;
           break;
       }
     }

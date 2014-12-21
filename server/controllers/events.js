@@ -50,25 +50,6 @@
     });
   };
 
-  Events.prototype.init = function() { // revisited for 0.0.4
-    var client = this.socket,
-      player = this.player;
-    clients.push(client);
-    players.enter2Room(player.id, rooms.getStarter().id);
-    client.emit(events.reRenderMap, rooms.get(player.room).json);
-    this._sendToRoom(events.otherPlayerEnter, {
-      id: player.id,
-      name: player.name,
-      direction: player.direction,
-      type: player.type,
-      location: {
-        x: player.location.x,
-        y: player.location.y
-      }
-    });
-    this._getAllPlayersOnRoom();
-  };
-
   Events.prototype.player_move = function(dir) { // revisited for 0.0.4
     var player = players.get(this.socket.id),
       nextToDo = players.move(player.id, dir),
@@ -138,6 +119,25 @@
         }
       };
     socket.emit('player_update', update);
+  };
+
+  Events.prototype.init = function() { // revisited for 0.0.4
+    var client = this.socket,
+      player = this.player;
+    clients.push(client);
+    players.enter2Room(player.id, rooms.getStarter().id);
+    client.emit(events.reRenderMap, rooms.get(player.room).json);
+    this._sendToRoom(events.otherPlayerEnter, {
+      id: player.id,
+      name: player.name,
+      direction: player.direction,
+      type: player.type,
+      location: {
+        x: player.location.x,
+        y: player.location.y
+      }
+    });
+    this._getAllPlayersOnRoom();
   };
 
   module.exports = Events;

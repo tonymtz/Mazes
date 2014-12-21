@@ -4,16 +4,18 @@
 
   var _ = require('underscore'),
     Map = require('./map'),
-    Maze = require('./maze'),
     Room = function(id, type, height, width, exits, name, multiplier) {
       this.id = id;
       this.name = 'map ' + id;
-      this.height = height || 39;
-      this.width = width || 39;
+      this.height = height || 9;
+      this.width = width || 9;
       this.exits = exits || 4;
       this.multiplier = multiplier || 1;
-      // this.maze = new Maze(this.height, this.width, this.multiplier, this.exits);
-      this.maze = new Map(this.height, this.width, this.multiplier, this.exits);
+
+      var mapObj = new Map(this.height, this.width, this.multiplier, this.exits);
+      this.spriteMap = mapObj.spriteMap;
+      this.walkableMap = mapObj.walkableMap;
+
       this.players = [];
       this.neighbors = {
         up: null,
@@ -29,8 +31,11 @@
         json.name = this.name;
         json.tileset = type || ['forest', 'dungeon', 'mountain', 'cave', 'snow', 'desert'][Math.floor(Math.random() * 6)];
 
-        var map = _.flatten(this.maze).join('');
-        json.cells = new Buffer(map).toString('base64');
+        var sprites = _.flatten(this.spriteMap).join('');
+        json.sprites = new Buffer(sprites).toString('base64');
+
+        var walkable = _.flatten(this.walkableMap).join('');
+        json.walkable = new Buffer(walkable).toString('base64');
 
         return json;
       }.call(this));

@@ -25,7 +25,7 @@
     move: function(id, dir) {
       var player = playersList[id],
         room = rooms.get(player.room),
-        maze = room.maze,
+        maze = room.walkableMap,
         nextToDo = player.move(maze, dir);
       return nextToDo;
     },

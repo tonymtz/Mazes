@@ -7,7 +7,7 @@
       eventCtrl = require('./controllers/events');
 
     io.on('connection', function(socket) {
-      var events = new eventCtrl(socket);
+      // var events = new eventCtrl(socket);
       console.log('CONN: %s', socket.id);
 
       socket.on('player_move', function(dir) {
